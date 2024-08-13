@@ -1,0 +1,111 @@
+.disabled { 
+  display:none
+}
+
+html, body {
+  background-color: black;
+  color: white;
+
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+}
+
+.navbar {
+  width: 100vw;
+  height: 80px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+
+  background-color:#2b2b2b;
+}
+
+.navbar-spacer {
+  height: 50px;
+  width: 30px;
+}
+
+.navbar-img {
+  height: 50px;
+}
+
+.navbar-img:hover {
+  cursor: pointer;
+}
+
+.video {
+  color: orange;
+  height: 50vh;
+}
+
+.video-container {
+  padding: 10px;
+  display: flex;
+}
+
+.video-info {
+  padding: 10px;
+  font-family: cursive;
+}
+
+.video-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.video-description {
+  background-color: #2b2b2b;
+  padding: 10px;
+}
+
+.comments {
+  padding: 10px;
+}
+
+.like {
+  background-color: #2b2b2b;
+  border-radius: 20px;
+  border: none;
+  color: white;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.like:hover {
+  cursor: pointer;
+  background-color: #303030;
+}
+
+.dislike {
+  background-color: #2b2b2b;
+  border-radius: 20px;
+  border: none;
+  color: white;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.dislike:hover {
+  cursor: pointer;
+  background-color: #303030;
+}
+
+.comment-span {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.clickable-user:hover {
+  cursor: pointer;
+  color: orange;
+}

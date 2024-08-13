@@ -1,0 +1,2 @@
+# Skibidi Hub
+this is a video streaming platform i shit out in two days just for the shits and giggles. it looks like a fnaf porn website before you log in (there is no login security, it doesnt check passwords so good luck you can just login to any user)

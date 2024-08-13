@@ -1,0 +1,41 @@
+body, html {
+    background-color: black;
+    color: orange;
+
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+
+    font-family: "Bodoni Moda SC", serif;
+    font-optical-sizing: auto;
+    font-size: 20px;
+}
+
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.login {
+    padding: 10px;
+    border-radius: 10px;
+    background: #1b1b1b;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+input {
+    border-radius: 5px;
+    border: none;
+    background-color: black;
+    color: orange;
+    font-size: 20px;
+    font-family: cursive;
+}

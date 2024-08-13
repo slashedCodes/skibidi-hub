@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet" />
+    <link href="../style.css" rel="stylesheet" />
+    <title>SkibidiHub - Video</title>
+</head>
+<body>
+  <div class="navbar">
+    <div class="navbar-spacer"></div>
+    <img class="navbar-img" onclick="home()" src="../assets/logo.png">
+    <div class="navbar-spacer"></div>
+    <h1>The site for all of your skibididi needs! We even have the skibididdy party!</h1>
+  </div>
+  <div class="video-container">
+    <video
+    id="video"
+    class="video-js video"
+    controls
+    preload="auto"
+    data-setup="{}"
+    >
+    <p class="vjs-no-js">
+      bro wtf are u watching this on? the fucking wii browser? 3ds browser? fucking nintendo switch facebook embed? you have no js and thats a skill issue
+    </p>
+    </video>
+  </div>
+
+  <div class="video-info">
+    <h1 id="video-title">LOADING</h1>
+    <div class="video-actions">
+      <h2 id="video-author">LOADING</h2>
+      <div class="navbar-spacer"></div>
+      <button class="like" onclick="like(window.location.pathname.split('/')[2])">
+        <img src="../assets/like.jpg" width="50">
+        <p id="video-likes">LOADING</p>
+      </button>
+      <button class="dislike" onclick="dislike(window.location.pathname.split('/')[2])">
+        <img src="../assets/dislike.jpg" width="50">
+        <p id="video-dislikes">LOADING</p>
+      </button>
+    </div>
+  </div>
+
+  <div class="video-description">
+    <h2 id="video-date">LOADING</h2>
+
+    <p id="video-description">LOADING</p>
+  </div>
+
+  <div id="comments" class="comments">
+    <h1>Comments</h1>
+    <hr>
+  </div>
+
+
+  <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
+  <script src="./../video.js"></script>
+</body>
+</html>
