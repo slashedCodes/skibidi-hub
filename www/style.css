@@ -1,8 +1,9 @@
-.disabled { 
-  display:none
+.disabled {
+  display: none;
 }
 
-html, body {
+html,
+body {
   background-color: black;
   color: white;
 
@@ -20,7 +21,7 @@ html, body {
   align-items: center;
   overflow: hidden;
 
-  background-color:#2b2b2b;
+  background-color: #2b2b2b;
 }
 
 .navbar-spacer {
@@ -105,7 +106,26 @@ html, body {
   align-items: center;
 }
 
+.clickable-user {
+  text-decoration: double;
+}
+
 .clickable-user:hover {
   cursor: pointer;
   color: orange;
+}
+
+.login {
+  padding: 3px;
+  background-color: orange;
+  color: black;
+  border-radius: 5px;
+  border: none;
+  font-size: 25px;
+  font-family: cursive;
+  text-align: right;
+}
+
+.login:hover {
+  cursor: pointer;
 }

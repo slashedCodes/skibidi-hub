@@ -1,36 +1,36 @@
 // Gets all the videos uploaded to SkibidiHub
 async function getAllVideos() {
-    try {
-        const response = await fetch(window.location.origin + "/api/getAllVideos")
-        if(!response.ok) throw new Error(`Response status: ${response.status}`);
+  try {
+    const response = await fetch(window.location.origin + "/api/getAllVideos");
+    if (!response.ok) throw new Error(`Response status: ${response.status}`);
 
-        const json = await response.json();
-        if (json) return json;
-    } catch (error) {
-        throw new Error(`Error: ${error}`)
-    }
+    const json = await response.json();
+    if (json) return json;
+  } catch (error) {
+    throw new Error(`Error: ${error}`);
+  }
 }
 
 // Gets all the videos uploaded to SkibidiHub and sorts them randomly. (This is our algorithm)
 async function getRandomVideos(limit) {
-    let videos = await getAllVideos();
-    let newVideos = [];
+  let videos = await getAllVideos();
+  let newVideos = [];
 
-    for(let i = 0; i < limit; i++) {
-        if (videos.length < 1) continue; // If there are no more videos then do not run the code below
-        let index = getRandomInt(videos.length);
-        let video = videos[index]
+  for (let i = 0; i < limit; i++) {
+    if (videos.length < 1) continue; // If there are no more videos then do not run the code below
+    let index = getRandomInt(videos.length);
+    let video = videos[index];
 
-        newVideos.push(video);
-        videos.splice(index, 1); // Remove video from the list of videos
-    }
-    
-    return newVideos;
+    newVideos.push(video);
+    videos.splice(index, 1); // Remove video from the list of videos
+  }
+
+  return newVideos;
 }
 
 // Returns a random int up to a set limit.
 function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
+  return Math.floor(Math.random() * max);
 }
 
 /*
@@ -49,7 +49,7 @@ function updateLoginState() {
 */
 
 document.addEventListener("DOMContentLoaded", async () => {
-    /*
+  /*
     // check if user is logged in
     updateLoginState();
     window.setInterval(updateLoginState, 1000);
@@ -70,62 +70,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
     */
 
-    const videos = await getRandomVideos(30);
-    console.log(videos);
+  const videos = await getRandomVideos(30);
+  console.log(videos);
 
-    document.getElementById("form").addEventListener("submit", (ev) => {
-        ev.preventDefault();
-        sendComment();
-    })
-})
+  document.getElementById("form").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    sendComment();
+  });
+});
 
 async function sendComment() {
-    /*
-    console.log(account)
-    if(account == null || account == undefined) {
-        alert("You must loggin to skibidi hub to continue.")
-        return;
-    }
-    var data = new FormData(document.getElementById("form"));
-    var json = Object.fromEntries(data);
-    json["commenter"] = account
-    */
+  var data = new FormData(document.getElementById("form"));
+  var json = Object.fromEntries(data);
+  const user = getCookie("user");
 
-    var data = new FormData(document.getElementById("form"));
-    var json = Object.fromEntries(data);
-    const user = await getCookie("user")
-    console.log(user)
-    if(user != null) {
-        json["commenter"] = user
-    } else {
-        alert("You must log in to comment.")
-        return
-    }
+  if (user != null) {
+    json["commenter"] = user;
+  } else {
+    alert("You must log in to comment.");
+    return;
+  }
 
-    const response = await fetch(window.location.origin + "/api/comment/", {
-        method: "POST",
-        body: JSON.stringify(json),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-}
-
-function getCookie(key) {
-    let split = document.cookie.split(";")
-    split.forEach(str => {split[split.indexOf(str)] = str.trim()})
-
-    for(let i = 0; i < split.length; i++) {
-        let pair = split[i];
-        if(pair != "Secure") {
-            let pairSplit = pair.split("=")
-            if(pairSplit[0] == key) { 
-                return pairSplit[1] 
-            } else { 
-                return null
-            }
-        } else {
-            return null
-        }
-    }
+  const response = await fetch(window.location.origin + "/api/comment/", {
+    method: "POST",
+    body: JSON.stringify(json),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: getToken(Cookies.get("user")),
+    },
+  });
 }
