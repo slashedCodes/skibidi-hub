@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
+    <title>SkibidiHub - User</title>
+    <link href="../style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-spacer"></div>
+      <img class="navbar-img" onclick="home()" src="../assets/logo.png" />
+      <div class="navbar-spacer"></div>
+      <h1>The site for all of your skibidi fnaf XXX needs!</h1>
+      <div class="navbar-spacer"></div>
+      <button
+        onclick="window.location.pathname = `/login`"
+        class="login"
+        id="login-button"
+      >
+        Login
+      </button>
+      <button
+        id="upload-button"
+        onclick="window.location.pathname = `/upload`"
+        class="login disabled"
+      >
+        Upload
+      </button>
+    </div>
+
+    <div class="user-info">
+      <img src="./../assets/user.png" class="user-pfp" />
+      <h1>
+        Videos published by: <br />
+        <p id="user-info-name" class="user-info-name"></p>
+      </h1>
+    </div>
+
+    <h1 id="loading" class="no-videos">
+      LOADING,,,,, <br />
+
+      <img src="./../assets/loading.gif" height="300px" />
+    </h1>
+    <h1 id="no-videos" class="no-videos disabled"></h1>
+    <div class="videos" id="videos"></div>
+
+    <script src="./../utils.js"></script>
+    <script src="./../user.js"></script>
+  </body>
+</html>

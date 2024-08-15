@@ -230,6 +230,14 @@ app.post("/api/dislike/:id", async (req, res) => {
   res.send(video);
 });
 
+app.get("/api/userVideos/:id", async (req, res) => {
+  const data = await client
+    .from("videos")
+    .select()
+    .eq("uploader", req.params.id);
+  res.send(data);
+});
+
 // Start App
 app.listen(port, () => {
   console.log(`skibidihub listening on port ${port}`);
@@ -241,6 +249,9 @@ function getRandomInt(max) {
 }
 
 function checkToken(token) {
+  if (token == undefined) return;
+  if (token == null) return;
+  if (token.trim() == "") return;
   let split = token.split("*&*&*&*&&&&*&&&&*&****&***&*");
   if (split.length > 1 && split[1] === "nexacopicloves15yearoldchineseboys") {
     return true;

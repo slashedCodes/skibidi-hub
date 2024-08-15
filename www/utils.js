@@ -1,7 +1,5 @@
 async function getVideo(id) {
   try {
-    console.log(Cookies.get("user"));
-
     let response;
     if (Cookies.get("user") != null) {
       response = await fetch(window.location.origin + `/api/video/${id}`, {
@@ -16,6 +14,21 @@ async function getVideo(id) {
     const blob = response.blob();
     if (!blob) throw new Error(`blob error`);
     return blob;
+  } catch (error) {
+    throw new Error(`Error: ${error}`);
+  }
+}
+
+async function getAllUserVideos(userID) {
+  try {
+    const response = await fetch(
+      window.location.origin + `/api/userVideos/${userID}`
+    );
+    if (!response.ok) throw new Error(`Response status: ${response.status}`);
+
+    const json = await response.json();
+    if (!json) throw new Error(`json error`);
+    return json;
   } catch (error) {
     throw new Error(`Error: ${error}`);
   }

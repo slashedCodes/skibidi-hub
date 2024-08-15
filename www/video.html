@@ -14,8 +14,19 @@
       <div class="navbar-spacer"></div>
       <h1>The site for all of your skibidi fnaf XXX needs!</h1>
       <div class="navbar-spacer"></div>
-      <button onclick="window.location.pathname = `/login`" class="login">
+      <button
+        onclick="window.location.pathname = `/login`"
+        class="login"
+        id="login-button"
+      >
         Login
+      </button>
+      <button
+        id="upload-button"
+        onclick="window.location.pathname = `/upload`"
+        class="login disabled"
+      >
+        Upload
       </button>
     </div>
     <div class="video-container">

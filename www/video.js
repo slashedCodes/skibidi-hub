@@ -76,6 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let video = document.getElementById("video");
   let id = window.location.pathname.split("/")[2];
 
+  if (Cookies.get("user") != null) {
+    document.getElementById("login-button").classList.add("disabled");
+    document.getElementById("upload-button").classList.remove("disabled");
+  }
+
   document
     .getElementById("comment-form")
     .addEventListener("submit", async (e) => {
