@@ -1,87 +1,56 @@
 async function getVideo(id) {
-  try {
-    let response;
-    if (Cookies.get("user") != null) {
-      response = await fetch(window.location.origin + `/api/video/${id}`, {
-        headers: { Authorization: getToken(Cookies.get("user")) },
-      });
-    } else {
-      response = await fetch(window.location.origin + `/api/video/${id}`);
-    }
-
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
-
-    const blob = response.blob();
-    if (!blob) throw new Error(`blob error`);
-    return blob;
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  return await axios.get(`/api/video/${id}`, {
+    headers: {
+      "Authorization": getToken(Cookies.get("user"))
+    },
+    responseType: "blob"
+  }).then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`getVideo() error: ${error}`)
+  });
 }
 
 async function getAllUserVideos(userID) {
-  try {
-    const response = await fetch(
-      window.location.origin + `/api/userVideos/${userID}`
-    );
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
-
-    const json = await response.json();
-    if (!json) throw new Error(`json error`);
-    return json;
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  return axios.get(`/api/userVideos/${userID}`).then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`getAllUserVideos() error: ${error}`);
+  })
 }
 
 async function getThumbnail(id) {
-  try {
-    let response;
-    if (Cookies.get("user") != null) {
-      response = await fetch(window.location.origin + `/api/thumbnail/${id}`, {
-        headers: { Authorization: getToken(Cookies.get("user")) },
-      });
-    } else {
-      response = await fetch(window.location.origin + `/api/thumbnail/${id}`);
+  return await axios.get(`/api/thumbnail/${id}`, { 
+    responseType: "blob",
+    headers: {
+      'Authorization': getToken(Cookies.get("user"))
     }
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
-
-    const blob = response.blob();
-    if (!blob) throw new Error(`blob error`);
-    return blob;
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  }).then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`getThumbnail() error: ${error}`);
+  })
 }
 
 async function getInfo(id) {
-  try {
-    const response = await fetch(
-      window.location.origin + `/api/videoInfo/${id}`
-    );
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
-
-    const json = response.json();
-    if (!json) throw new Error(`json error`);
-    return json;
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  return await axios.get(`/api/videoInfo/${id}`, {
+    responseType: "json",
+    headers: {
+      "Authorization": getToken(Cookies.get("user"))
+    }
+  }).then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`getInfo() error: ${error}`);
+  })
 }
 
 async function getComments(id) {
-  try {
-    const response = await fetch(
-      window.location.origin + `/api/comments/${id}`
-    );
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
-
-    const json = await response.json();
-    if (!json) throw new Error(`json error`);
-    return json;
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  return await axios.get(`/api/comments/${id}`).then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`getComments() error: ${error}`)
+  })
 }
 
 function isLoggedIn() {
@@ -89,6 +58,9 @@ function isLoggedIn() {
 }
 
 function getToken(user) {
+  if(user == undefined || user == null) {
+    return "peepeecaca unauthorized";
+  }
   return (
     user + "*&*&*&*&&&&*&&&&*&****&***&*nexacopicloves15yearoldchineseboys"
   );

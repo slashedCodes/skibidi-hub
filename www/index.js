@@ -1,14 +1,15 @@
 // Gets all the videos uploaded to SkibidiHub
 async function getAllVideos() {
-  try {
-    const response = await fetch(window.location.origin + "/api/getAllVideos");
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
 
-    const json = await response.json();
-    if (json) return json;
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  return await axios.get("/api/getAllVideos", {
+    headers: {
+      'Authorization': getToken(Cookies.get("user")),
+    }
+  }).then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`getAllVideos() error: ${error}`);
+  });
 }
 
 // Gets all the videos uploaded to SkibidiHub and sorts them randomly. (This is our algorithm)
@@ -33,70 +34,60 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-/*
-var account = null
-
-function updateLoginState() {
-    let cookie = RegExp("name"+"=([^;]+)").exec(document.cookie);
-    if(cookie != null) account = cookie[1]; 
-    if(account != null && account != undefined)  {
-        console.log("successfully logged in as " + account)
-        loginBtn.innerText = account
-        loginBtn.href = "/user/" + account
-        logoutBtn.classList.remove("disabled")
-    }
-}
-*/
-
 document.addEventListener("DOMContentLoaded", async () => {
-  /*
-    // check if user is logged in
-    updateLoginState();
-    window.setInterval(updateLoginState, 1000);
-    
-    logoutBtn.addEventListener('click', e=>{
-        e.preventDefault();
-        //log out by trying to authenticate with an invalid login (yes this is the only way using basic auth)
-        fetch('/logout', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Basic ' + btoa('bullshit:aasdjisadjasidjaisdjosadoasojd')
-            }
-        }).then(response => {
-            if (response.status === 200) {
-                window.location.reload();
-            }
-        });
-    })
-    */
-
-  const videos = await getRandomVideos(30);
-  console.log(videos);
-
-  document.getElementById("form").addEventListener("submit", (ev) => {
-    ev.preventDefault();
-    sendComment();
-  });
-});
-
-async function sendComment() {
-  var data = new FormData(document.getElementById("form"));
-  var json = Object.fromEntries(data);
-  const user = getCookie("user");
-
-  if (user != null) {
-    json["commenter"] = user;
-  } else {
-    alert("You must log in to comment.");
-    return;
+  if (Cookies.get("user") != null) {
+    document.getElementById("login-button").classList.add("disabled");
+    document.getElementById("logout-button").classList.remove("disabled");
+    document.getElementById("upload-button").classList.remove("disabled");
   }
 
-  const response = await fetch(window.location.origin + "/api/comment/", {
-    method: "POST",
-    body: JSON.stringify(json),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: getToken(Cookies.get("user")),
-    },
-  });
+  const videos = await getRandomVideos(30);
+  videos.forEach(video => {
+    console.log(video.title);
+    console.log(getToken(Cookies.get("user")))
+    makeVideo(video.id, video)
+  })
+});
+
+async function makeVideo(id, info) {
+  const thumbnail = URL.createObjectURL(await getThumbnail(id));
+
+  const video = document.createElement("div");
+  video.classList.add("video");
+
+  const img = document.createElement("img");
+  img.classList.add("thumbnail");
+  img.setAttribute("src", thumbnail);
+  img.onclick = function (event) {
+    window.location.pathname = `/video/${id}`;
+  };
+  video.appendChild(img);
+
+  const videoInfoContainer = document.createElement("div");
+  videoInfoContainer.classList.add("video-info-container");
+  video.appendChild(videoInfoContainer);
+
+  const videoTitle = document.createElement("h3");
+  videoTitle.classList.add("video-title");
+  const title = info.title
+  if(info.title.length > 25) {
+    videoTitle.innerText = title.slice(0, -(info.title.length - 22)) + "...";
+  } else {
+    videoTitle.innerText = title
+  }
+
+  videoTitle.onclick = function (event) {
+    window.location.pathname = `/video/${id}`;
+  };
+  videoInfoContainer.appendChild(videoTitle);
+
+  const videoUploader = document.createElement("p");
+  videoUploader.classList.add("video-uploader");
+  videoUploader.innerText = `published by: ${info.uploader}`;
+  videoUploader.onclick = function (event) {
+    window.location.pathname = `/user/${info.uploader}`;
+  };
+  videoInfoContainer.appendChild(videoUploader);
+
+  document.getElementById("videos").appendChild(video);
 }

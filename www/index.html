@@ -5,21 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
-    <script src="index.js"></script>
-    <script src="utils.js"></script>
     <title>SkibidiHub - Home</title>
   </head>
   <body>
-    <a id="loginBtn" href="/login">Log in</a>
+    <div class="navbar">
+      <div class="navbar-spacer"></div>
+      <img class="navbar-img" onclick="home()" src="../assets/logo.png" />
+      <div class="navbar-spacer"></div>
+      <h1>The site for all of your skibidi fnaf XXX needs!</h1>
+      <div class="navbar-spacer"></div>
+      <button
+        onclick="window.location.pathname = `/login`"
+        class="login"
+        id="login-button"
+      >
+        Login
+      </button>
+      <button
+        id="upload-button"
+        onclick="window.location.pathname = `/upload`"
+        class="login disabled"
+      >
+        Upload
+      </button>
+      <button id="logout-button" onclick="Cookies.remove('user'); window.location.reload()" class="login disabled">Logout</button>
+    </div>
 
-    <form id="form">
-      <label name="videoID">video id</label>
-      <input type="text" name="videoID" id="videoID" /><br />
+    <h1>Recomended videos:</h1>
+    <hr />
 
-      <label name="text">text</label>
-      <input type="text" name="text" id="text" /><br />
+    <div class="videos" id="videos"></div>
 
-      <input type="submit" id="submit" />
-    </form>
+    <script src="index.js"></script>
+    <script src="utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </body>
 </html>

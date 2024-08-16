@@ -209,3 +209,9 @@ body {
   font-family: sans-serif;
   font-weight: 100;
 }
+
+.video-author:hover {
+  color: purple;
+  text-decoration: overline;
+  cursor: pointer;
+}

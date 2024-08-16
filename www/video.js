@@ -1,71 +1,52 @@
-let likev = false;
-let dislikev = false;
+let liked = false;
+let disliked = false;
 
 async function like(id) {
-  if (likev)
+  if (liked)
     return alert(
       "you already like video you can not like it anymore beacuse you aleady like video!!!"
     );
-  try {
-    if (Cookies.get("user") == null) return alert("You need to login to like.");
-
-    const response = await fetch(window.location.origin + `/api/like/${id}`, {
-      method: "POST",
-      headers: {
-        Authorization: getToken(Cookies.get("user")),
-      },
-    });
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
-
-    const json = await response.json();
-    if (!json) throw new Error(`json error`);
-    if (json.status == 204) {
-      likev = true;
+  
+  axios.post(`/api/like/${id}`, {}, {
+    headers: {
+      'Authorization': getToken(Cookies.get("user"))
+    }
+  }).then(response => {
+    if (response.data.status == 204) {
+      liked = true;
       document.getElementById("video-likes").innerText =
         parseInt(document.getElementById("video-likes").innerText) + 1;
     } else {
       document.getElementById("video-likes").innerText =
         "ERROR ERROR ERROR ERROR ERRROR SERVCER ERROR";
     }
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  }).catch(error => {
+    throw new Error(`like() error: ${error}`);
+  })
 }
 
 async function dislike(id) {
-  if (dislikev)
+  if (disliked)
     return alert(
       "you already dislike video you can not dislike it anymore beacuse you aleady dislike video!!!"
     );
-  try {
-    if (Cookies.get("user") == null)
-      return alert("You need to login to dislike.");
-
-    const response = await fetch(
-      window.location.origin + `/api/dislike/${id}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: getToken(Cookies.get("user")),
-        },
-      }
-    );
-    if (!response.ok) throw new Error(`Response status: ${response.status}`);
-
-    const json = await response.json();
-    if (!json) throw new Error(`json error`);
-    console.log(json);
-    if (json.status == 204) {
-      dislikev = true;
+  
+  axios.post(`/api/dislike/${id}`, {}, {
+    headers: {
+      'Authorization': getToken(Cookies.get("user"))
+    }
+  }).then(response => {
+    if (response.data.status == 204) {
+      disliked = true;
       document.getElementById("video-dislikes").innerText =
         parseInt(document.getElementById("video-dislikes").innerText) + 1;
     } else {
       document.getElementById("video-dislikes").innerText =
         "ERROR ERROR ERROR ERROR ERRROR SERVCER ERROR";
     }
-  } catch (error) {
-    throw new Error(`Error: ${error}`);
-  }
+  }).catch(error => {
+    throw new Error(`dislike() error: ${error}`);
+  })
 }
 
 function gotoUser(user) {
@@ -78,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (Cookies.get("user") != null) {
     document.getElementById("login-button").classList.add("disabled");
+    document.getElementById("logout-button").classList.remove("disabled");
     document.getElementById("upload-button").classList.remove("disabled");
   }
 
@@ -89,32 +71,28 @@ document.addEventListener("DOMContentLoaded", () => {
       var json = Object.fromEntries(formData);
       const user = Cookies.get("user");
 
-      if (user != null) {
-        json["commenter"] = user;
-      } else {
+      if (!user) {
         alert("You must log in to comment.");
         return;
       }
 
-      await fetch(window.location.origin + "/api/comment/", {
-        method: "POST",
-        body: JSON.stringify({
-          commenter: user,
-          videoID: id,
-          text: json["text"],
-        }),
+      await axios.post(`/api/comment`, {
+        commenter: user,
+        videoID: id,
+        text: json["text"]
+      }, {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: getToken(user),
-        },
-      }).then(async (data) => {
-        const response = await data.json();
-        if (response.status == 201) {
+          'Authorization': getToken(Cookies.get("user"))
+        }
+      }).then(response => {
+        if (response.data.status == 201) {
           makeComment(Cookies.get("user"), "right now", json["text"]);
         } else {
           alert("ERROR ERROR ERROR ERORROR SERVCER ERROR!!!");
         }
-      });
+      }).catch(error => {
+        throw new Error(`comment error: ${error}`)
+      })
     });
 
   getVideo(id).then((blob) => {
@@ -137,6 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById(
         "video-author"
       ).innerText = `Uploaded by: ${info.uploader}`;
+      document.getElementById("video-author").onclick = function(event) {
+        window.location.pathname = `/user/${info.uploader}`
+      }
       document.getElementById("video-date").innerText =
         parseTimestamp(info.uploaded_at).date +
         " " +
@@ -158,6 +139,8 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       });
     });
+
+    document.getElementById("loading").classList.add("disabled")
   });
 });
 

@@ -28,6 +28,7 @@
       >
         Upload
       </button>
+      <button id="logout-button" onclick="Cookies.remove('user'); window.location.reload()" class="login disabled">Logout</button>
     </div>
     <div class="video-container">
       <video
@@ -43,12 +44,14 @@
           skill issue
         </p>
       </video>
+
+      <img src="./../assets/loading.gif" width="300" id="loading">
     </div>
 
     <div class="video-info">
       <h1 id="video-title">LOADING</h1>
       <div class="video-actions">
-        <h2 id="video-author">LOADING</h2>
+        <h2 id="video-author" class="video-author">LOADING</h2>
         <div class="navbar-spacer"></div>
         <button
           class="like"
@@ -86,11 +89,12 @@
         >
         </textarea>
         <br />
-        <input type="submit" />
+        <input type="submit" value="comment!" />
       </form>
       <hr />
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
     <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
     <script src="./../utils.js"></script>

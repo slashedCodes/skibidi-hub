@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="upload.css">
+    <title>SkibidiHub - Upload</title>
+</head>
+<body>
+    <div class="container">
+        <form id="form" class="form">
+            <label for="video">video (must be .mp4)</label> <br />
+            <input type="file" name="video" accept="video/mp4"> <br />
+            
+            <label for="thumbnail">thumbnail (must be .jpg)</label> <br />
+            <input type="file" name="thumbnail" accept="image/jpeg"> <br />
+
+            <label for="title">video title</label> <br />
+            <input type="text" name="title"> <br />
+
+            <label for="description">video description</label> <br />
+            <textarea name="description" rows="20"></textarea> <br />
+
+            <input type="submit" value="upload">
+        </form>
+
+        <br>
+        <label for="progress-bar" id="progress">0%</label>
+        <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="upload.js"></script>
+</body>
+</html>

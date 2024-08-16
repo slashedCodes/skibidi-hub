@@ -8,13 +8,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (Cookies.get("user") != null) {
     document.getElementById("user-info-name").innerText = id;
     document.getElementById("login-button").classList.add("disabled");
+    document.getElementById("logout-button").classList.remove("disabled");
     document.getElementById("upload-button").classList.remove("disabled");
   } else {
     document.getElementById("user-info-name").innerText =
       "⚠️⚠️⚠️⚠️SIGN IN to see this EPIC content❌❌💋🩻";
   }
 
-  const videos = await getAllUserVideos(id);
+  const videos = await getAllUserVideos(id)
   document.getElementById("loading").classList.add("disabled");
   if (videos.data.length > 0) {
     videos.data.forEach((video) => {
@@ -26,19 +27,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function makeVideo(id, info) {
-  /*
-      <div class="video">
-        <img
-          src=""
-          class="thumbnail"
-        />
-        <div class="video-info-container">
-          <h3 class="video-title">I GROOMED THIS 15 YEAR OLD!!!</h3>
-          <p class="video-uploader">uploaded by: markiplier</p>
-        </div>
-      </div>
-  */
-
   const thumbnail = URL.createObjectURL(await getThumbnail(id));
 
   const video = document.createElement("div");

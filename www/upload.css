@@ -1,0 +1,49 @@
+html, body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+
+    background-color: black;
+    font-size: 20px;
+    color: orange;
+}
+
+.form {
+    padding: 10px;
+    background: #232323;
+    border-radius: 10px;
+    color: orange;
+    border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 600px;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    background-color: black;
+    color: orange;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    border: none;
+    border-radius: 20px;
+    font-size: 20px;
+}
+
+textarea {
+    background-color: purple;
+    color: white;
+    border: none;
+    text-decoration: dotted;
+    font-size: 17px;
+    font-family: cursive;
+}

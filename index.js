@@ -3,10 +3,29 @@ const fs = require("node:fs");
 const path = require("node:path");
 const supabase = require("@supabase/supabase-js");
 const bodyParser = require("body-parser");
+const multer = require("multer");
 const app = express();
 require("dotenv").config();
 
 const port = 3000;
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if(!fs.existsSync(path.join(__dirname, path.join("videos", req.body.id)))) {
+      fs.mkdirSync(path.join(__dirname, path.join("videos", req.body.id)))
+    }
+    return cb(null, path.join(__dirname, path.join("videos", req.body.id)))
+  },
+  filename: function (req, file, cb) {
+    if(file.fieldname == "video") cb(null, file.fieldname + ".mp4")
+    if(file.fieldname == "thumbnail") cb(null, file.fieldname + ".jpg")
+  }
+})
+const upload = multer({ storage: storage });
+
+const titleList = [
+  "CHICA added BBQ SAUCE to the mcdonalds FOOTJOB!!!",
+  "FREDDY's bubble GYATT bounces on my BBC and breaks it in TWO PIECES!!!",
+]
 
 const client = supabase.createClient(
   process.env.SUPABASE_URL,
@@ -16,20 +35,6 @@ const client = supabase.createClient(
 app.use(express.static("www")); // Static folder
 app.use(bodyParser.json());
 
-/*
-// Make sure that the user has a name cookie if they are logged in
-app.use((req,res,next) => {
-    const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
-    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':')
-
-    if(login.trim().length > 0 && password.trim().length > 0) {
-        res.cookie("name", login.trim())
-    }
-
-    next()
-});
-*/
-
 // User facing URL's
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "index.html")));
@@ -38,6 +43,11 @@ app.get("/", (req, res) => {
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "login.html")));
 });
+
+app.get("/upload", (req, res) => {
+  res.sendFile(path.join(__dirname, path.join("www", "upload.html")));
+})
+
 app.get("/video/:id", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "video.html")));
 });
@@ -45,27 +55,6 @@ app.get("/video/:id", (req, res) => {
 app.get("/user/:user", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "user.html")));
 });
-
-/*
-// what 
-// stole most of this from stack overflow https://stackoverflow.com/questions/23616371/basic-http-authentication-with-node-and-express-4
-app.get('/api/login', (req, res) => {
-    const b64auth = (req.headers.authorization || '').split(' ')[1] || ''
-    const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':')
-    let loggedOut = login == "bullshit" && password == "aasdjisadjasidjaisdjosadoasojd"
-
-    if(!loggedOut && login.trim().length > 0 && password.trim().length > 0) {
-        res.send("Successfully logged in.<script>history.go(-1)</script>");
-        return;
-    }
-
-    res.set("WWW-Authenticate", "Basic realm=skibidihub")
-    res.status(401).send("Please login")
-});
-app.get('/logout', (req, res) => {
-    res.clearCookie("name").status(401).send("Successfully logged out.<script>history.go(-1)</script>")
-})
-*/
 
 // API //
 
@@ -138,7 +127,14 @@ app.get("/api/videoInfo/:id", (req, res) => {
         res.sendStatus(data.status);
       }
 
-      res.send(data["data"][0]);
+      if(checkToken(req.headers.authorization)) {
+        res.send(data["data"][0]);
+      } else {
+        let newData = data["data"][0];
+        newData.description = "SIGN IN to see this EPIC content"
+        newData.title = titleList[getRandomInt(titleList.length)]
+        res.send(newData);
+      }
     });
 });
 
@@ -171,7 +167,20 @@ app.get("/api/getAllVideos", (req, res) => {
         res.sendStatus(data.status);
       }
 
-      res.send(data["data"]);
+      if(checkToken(req.headers.authorization)) {
+        res.send(data["data"]);
+      } else {
+        let newData = [];
+        data.data.forEach(video => {
+          let temp = video;
+          temp.description = "SIGN IN to see this EPIC content"
+          temp.title = titleList[getRandomInt(titleList.length)]
+          newData.push(temp);
+        })
+
+        res.send(newData);
+      }
+
     });
 });
 
@@ -237,6 +246,21 @@ app.get("/api/userVideos/:id", async (req, res) => {
     .eq("uploader", req.params.id);
   res.send(data);
 });
+
+app.post("/api/upload", upload.fields([
+  { name: 'video' }, { name: 'thumbnail' }
+]), async (req, res) => {
+  await client.from("videos").insert({
+    id: req.body.id,
+    uploaded_at: new Date().toISOString,
+    likes: 0,
+    dislikes: 0,
+    description: req.body.description,
+    title: req.body.title,
+    uploader: req.body.uploader
+  })
+})
+
 
 // Start App
 app.listen(port, () => {
