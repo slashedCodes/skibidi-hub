@@ -256,7 +256,7 @@ app.post("/api/comment", async (req, res) => {
   client
     .from("comments")
     .insert({
-      id: id["data"].length + 1,
+      id: id["data"][id["data"].length - 1].id + 1,
       created_at: new Date().toISOString,
       commenter: req.body["commenter"],
       video_id: req.body["videoID"],
