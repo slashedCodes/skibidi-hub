@@ -10,6 +10,7 @@ require("dotenv").config();
 const port = 3000;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    console.log(req);
     if(!fs.existsSync(path.join(__dirname, path.join("videos", req.body.id)))) {
       fs.mkdirSync(path.join(__dirname, path.join("videos", req.body.id)))
     }
@@ -25,6 +26,16 @@ const upload = multer({ storage: storage });
 const titleList = [
   "CHICA added BBQ SAUCE to the mcdonalds FOOTJOB!!!",
   "FREDDY's bubble GYATT bounces on my BBC and breaks it in TWO PIECES!!!",
+  "MONTY gets the PROFESSIONAL hawk tuah GOP GOP!!!",
+  "stepmother FOXY is hungry for COCK!!!",
+  "POV impregnate the CUPCAKE plushie with me!!!",
+  "CHICA cheated on me with the CUPCAKE and i joined IN!!!!",
+  "FREDDYS BBC got stuck in the GARBAGE DISPOSAL!!! You will NOT believe what happened next!",
+  "LEGENDARY pegging session with FUNTIME FOXY!!!",
+  "FUNTIME FOXY gives me the SLOPPY TOPPY with a TWIST!!!",
+  "CHICA does OZEMPIC MUKBANG!!!!",
+  "FOXY LICKS MY TOES ASMR!!!!",
+  "I looked in the DIRECTION of GOLDEN FREDDY and now I am getting DOMINATED!!!"
 ]
 
 const client = supabase.createClient(
