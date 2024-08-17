@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const id = window.location.pathname.split("/")[2];
+  const id = decodeURI(window.location.pathname.split("/")[2]);
 
   document.getElementById(
     "no-videos"
@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("user-info-name").innerText = id;
     document.getElementById("login-button").classList.add("disabled");
     document.getElementById("logout-button").classList.remove("disabled");
+    document.getElementById("account-button").classList.remove("disabled");
     document.getElementById("upload-button").classList.remove("disabled");
   } else {
     document.getElementById("user-info-name").innerText =

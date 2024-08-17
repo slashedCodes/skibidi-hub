@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("login-button").classList.add("disabled");
     document.getElementById("logout-button").classList.remove("disabled");
     document.getElementById("upload-button").classList.remove("disabled");
+    document.getElementById("account-button").classList.remove("disabled");
     document.getElementById("sign-in-msg").classList.add("disabled");
   }
 

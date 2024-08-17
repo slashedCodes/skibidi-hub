@@ -2,6 +2,10 @@ let liked = false;
 let disliked = false;
 
 async function like(id) {
+  if(!Cookies.get("user")) {
+    return alert("you must be loggefd in to like!");
+  }
+
   if (liked)
     return alert(
       "you already like video you can not like it anymore beacuse you aleady like video!!!"
@@ -26,6 +30,10 @@ async function like(id) {
 }
 
 async function dislike(id) {
+  if(!Cookies.get("user")) {
+    return alert("you must be loggefd in to dislike!");
+  }
+
   if (disliked)
     return alert(
       "you already dislike video you can not dislike it anymore beacuse you aleady dislike video!!!"
@@ -60,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (Cookies.get("user") != null) {
     document.getElementById("login-button").classList.add("disabled");
     document.getElementById("logout-button").classList.remove("disabled");
+    document.getElementById("account-button").classList.remove("disabled");
     document.getElementById("upload-button").classList.remove("disabled");
   }
 

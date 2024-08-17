@@ -10,7 +10,7 @@
   <body>
     <div class="navbar">
       <div class="navbar-spacer"></div>
-      <img class="navbar-img" onclick="home()" src="../assets/logo.png" />
+      <img class="navbar-img" onclick="window.location.pathname = '/'" src="../assets/logo.png" />
       <div class="navbar-spacer"></div>
       <h1>The site for all of your skibidi fnaf XXX needs!</h1>
       <div class="navbar-spacer"></div>
@@ -28,6 +28,7 @@
       >
         Upload
       </button>
+      <button id="account-button" onclick="window.location.pathname = `/user/${Cookies.get('user')}`" class="login disabled">My Account</button>
       <button id="logout-button" onclick="Cookies.remove('user'); window.location.reload()" class="login disabled">Logout</button>
     </div>
 
