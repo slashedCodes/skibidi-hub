@@ -43,8 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const videos = await getRandomVideos(30);
   videos.forEach(video => {
-    console.log(video.title);
-    console.log(getToken(Cookies.get("user")))
     makeVideo(video.id, video)
   })
 });

@@ -10,7 +10,6 @@ require("dotenv").config();
 const port = 3000;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    //console.log(req);
     if(!fs.existsSync(path.join(__dirname, path.join("videos", req.body.id)))) {
       fs.mkdirSync(path.join(__dirname, path.join("videos", req.body.id)))
     }
@@ -188,7 +187,6 @@ app.get("/api/comments/:videoID", (req, res) => {
           comments.push(comment);
         }
 
-        console.log(comments)
         res.send(comments);
         return;
       }
