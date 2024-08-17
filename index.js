@@ -4,6 +4,7 @@ const path = require("node:path");
 const supabase = require("@supabase/supabase-js");
 const bodyParser = require("body-parser");
 const cookie_parser = require("cookie-parser");
+const axios = require("axios");
 const multer = require("multer");
 const app = express();
 require("dotenv").config();
@@ -55,6 +56,7 @@ const fakeCommentList = [
   "you look Beautiful darling, how about you consider contacting me? 🤪🤭"
 ]
 
+const webhookURL = process.env.WEBHOOK_URL;
 const client = supabase.createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
@@ -143,6 +145,20 @@ app.get("/api/thumbnail/:id", (req, res) => {
     return;
   }
 
+  if (fs.existsSync(path.join("videos", req.params.id + "/"))) {
+    res.sendFile(
+      path.join(
+        __dirname,
+        path.join("videos", path.join(req.params.id, "thumbnail.jpg"))
+      )
+    );
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+// Get a videos thumbnail according to its video ID.
+app.get("/api/webhookThumbnail/:id", (req, res) => {
   if (fs.existsSync(path.join("videos", req.params.id + "/"))) {
     res.sendFile(
       path.join(
@@ -262,6 +278,26 @@ app.post("/api/comment", async (req, res) => {
     .then((data) => {
       res.send(data);
     });
+  
+  // Discord webhook
+  sendWebhook(
+    "new comment guys",
+    "New COMMENT!!!!!",
+    [
+      {
+        "id": 220464536,
+        "description": req.body.text.trim(),
+        "fields": [],
+        "title": `New comment on video ${req.body.videoID}!`,
+        "author": {
+          "name": req.body.commenter,
+          "url": `http://skibidihub.buttplugstudios.xyz/user/${req.body.commenter}`
+        },
+        "url": `http://skibidihub.buttplugstudios.xyz/video/${req.body.videoID}`,
+        "color": 917248
+      }
+    ]
+  )
 });
 
 // Like a video
@@ -309,6 +345,7 @@ app.post("/api/upload", upload.fields([
 ]), async (req, res) => {
   if(!checkBodyVideo(req.body)) return res.sendStatus(400);
   if(!checkToken(req, "/api/upload")) return;
+
   await client.from("videos").insert({
     id: req.body.id,
     uploaded_at: new Date().toISOString,
@@ -318,6 +355,29 @@ app.post("/api/upload", upload.fields([
     title: req.body.title,
     uploader: req.body.uploader
   })
+
+  // Discord webhook
+  sendWebhook(
+    `new video guys`,
+    "New UPLOAD!!!!!",
+    [
+      {
+        "id": 220464536,
+        "description": req.body.description,
+        "fields": [],
+        "title": "New video guys!!!",
+        "author": {
+          "name": req.body.uploader,
+          "url": `http://skibidihub.buttplugstudios.xyz/user/${req.body.uploader}`
+        },
+        "url": `http://skibidihub.buttplugstudios.xyz/video/${req.body.id}`,
+        "color": 9830655,
+        "image": {
+          "url": `https://skibidihub.buttplugstudios.xyz/api/webhookThumbnail/${req.body.id}`
+        }
+      }
+    ]
+  )
 })
 
 
@@ -345,6 +405,15 @@ function checkToken(req, func) {
     return false;
   }
 }
+
+async function sendWebhook(message, username, embeds) {
+  await axios.post(webhookURL, {
+    "username": username,
+    "content": message,
+    "embeds": embeds
+  })
+}
+
 const nanoid = (length) => {
   const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let id = '';
