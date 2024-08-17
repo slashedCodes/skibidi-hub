@@ -217,7 +217,7 @@ app.get("/api/getAllVideos", (req, res) => {
         res.send(data["data"]);
       } else {
         let newData = [];
-        for(let i = 0; i < 30; i++) {
+        for(let i = 0; i < 12; i++) {
           let temp = {};
           temp.description = "SIGN IN to see this EPIC content"
           temp.title = fakeTitleList[getRandomInt(fakeTitleList.length)]
