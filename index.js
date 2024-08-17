@@ -251,7 +251,7 @@ app.get("/api/getAllVideos", (req, res) => {
 // Send a comment
 app.post("/api/comment", async (req, res) => {
   if (!checkToken(req)) return;
-  
+
   client
     .from("comments")
     .insert({
@@ -339,6 +339,7 @@ function checkToken(req) {
   if (token.trim() == "") return;
   let split = token.split("*&*&*&*&&&&*&&&&*&****&***&*");
   if (split.length > 1 && split[1] === "nexacopicloves15yearoldchineseboys") {
+    console.log(split[0]);
     return true;
   } else {
     return false;
