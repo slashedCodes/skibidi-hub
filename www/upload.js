@@ -23,10 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
             data.set("id", nanoid(7));
         }
 
+        if(data.get("thumbnail").size < 1) return alert("Please enter valid form data");
+        if(data.get("video").size < 1) return alert("Please enter valid form data");
+        if(data.get("title").trim() == "") return alert("Please enter valid form data");
+
         axios.post("/api/upload", data, {
             headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': getToken(Cookies.get("user"))
+                'Content-Type': 'multipart/form-data'
             },
 
             onUploadProgress: function(event) {

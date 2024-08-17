@@ -28,14 +28,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function makeVideo(id, info) {
-  const thumbnail = URL.createObjectURL(await getThumbnail(id));
-
   const video = document.createElement("div");
   video.classList.add("video");
 
   const img = document.createElement("img");
   img.classList.add("thumbnail");
-  img.setAttribute("src", thumbnail);
+  img.setAttribute("src", `/api/thumbnail/${id}`);
   img.onclick = function (event) {
     window.location.pathname = `/video/${id}`;
   };
@@ -47,7 +45,12 @@ async function makeVideo(id, info) {
 
   const videoTitle = document.createElement("h3");
   videoTitle.classList.add("video-title");
-  videoTitle.innerText = info.title;
+  const title = info.title
+  if(info.title.length > 25) {
+    videoTitle.innerText = title.slice(0, -(info.title.length - 22)) + "...";
+  } else {
+    videoTitle.innerText = title
+  }
   videoTitle.onclick = function (event) {
     window.location.pathname = `/video/${id}`;
   };

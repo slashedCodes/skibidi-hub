@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const supabase = require("@supabase/supabase-js");
 const bodyParser = require("body-parser");
+const cookie_parser = require("cookie-parser");
 const multer = require("multer");
 const app = express();
 require("dotenv").config();
@@ -10,6 +11,8 @@ require("dotenv").config();
 const port = 3000;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    if(!checkBodyVideo(req.body)) return;
+    if(!checkToken(req)) return;
     if(!fs.existsSync(path.join(__dirname, path.join("videos", req.body.id)))) {
       fs.mkdirSync(path.join(__dirname, path.join("videos", req.body.id)))
     }
@@ -59,6 +62,7 @@ const client = supabase.createClient(
 
 app.use(express.static("www")); // Static folder
 app.use(bodyParser.json());
+app.use(cookie_parser());
 
 // User facing URL's
 app.get("/", (req, res) => {
@@ -84,8 +88,13 @@ app.get("/user/:user", (req, res) => {
 // API //
 
 // Get an mp4 file according to its video ID.
-app.get("/api/video/:id", (req, res) => {
-  if (!checkToken(req.headers.authorization)) {
+app.get("/api/video/:id", function (req, res) {
+  const range = req.headers.range;
+  if (!range) {
+    return res.status(400).send("Requires Range header");
+  }
+
+  if(!checkToken(req)) {
     return res.sendFile(
       path.join(
         __dirname,
@@ -94,21 +103,28 @@ app.get("/api/video/:id", (req, res) => {
     );
   }
 
-  if (fs.existsSync(path.join("videos", req.params.id + "/"))) {
-    res.sendFile(
-      path.join(
-        __dirname,
-        path.join("videos", path.join(req.params.id, "video.mp4"))
-      )
-    );
-  } else {
-    res.sendStatus(404);
-  }
+  const videoPath = path.join(__dirname, path.join("videos", path.join(req.params.id, "video.mp4")));
+  if(!fs.existsSync(videoPath)) return res.sendStatus(404);
+  
+  const videoSize = fs.statSync(videoPath).size;
+  const CHUNK_SIZE = 10 ** 6;
+  const start = Number(range.replace(/\D/g, ""));
+  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+  const contentLength = end - start + 1;
+  const headers = {
+      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": contentLength,
+      "Content-Type": "video/mp4",
+  };
+  res.writeHead(206, headers);
+  const videoStream = fs.createReadStream(videoPath, { start, end });
+  videoStream.pipe(res);
 });
 
 // Get a videos thumbnail according to its video ID.
 app.get("/api/thumbnail/:id", (req, res) => {
-  if (!checkToken(req.headers.authorization)) {
+  if (!checkToken(req)) {
     let images = fs.readdirSync(
       path.join(__dirname, path.join("www", path.join("assets", "troll")))
     );
@@ -146,7 +162,7 @@ app.get("/api/videoInfo/:id", (req, res) => {
     .select()
     .eq("id", req.params.id)
     .then((data) => {
-      if(checkToken(req.headers.authorization)) {
+      if(checkToken(req)) {
         res.send(data["data"][0]);
       } else {
         let newData = {};
@@ -175,7 +191,7 @@ app.get("/api/comments/:videoID", (req, res) => {
     .select()
     .eq("video_id", req.params.videoID)
     .then((data) => {
-      if(!checkToken(req.headers.authorization)) {
+      if(!checkToken(req)) {
         let comments = [];
         for(let i = 0; i < 8; i++) {
           let comment = {};
@@ -213,7 +229,7 @@ app.get("/api/getAllVideos", (req, res) => {
         res.sendStatus(data.status);
       }
 
-      if(checkToken(req.headers.authorization)) {
+      if(checkToken(req)) {
         res.send(data["data"]);
       } else {
         let newData = [];
@@ -234,7 +250,7 @@ app.get("/api/getAllVideos", (req, res) => {
 
 // Send a comment
 app.post("/api/comment", async (req, res) => {
-  if (!checkToken(req.headers.authorization)) return;
+  if (!checkToken(req)) return;
   const id = await client.from("comments").select();
 
   client
@@ -253,7 +269,7 @@ app.post("/api/comment", async (req, res) => {
 
 // Like a video
 app.post("/api/like/:id", async (req, res) => {
-  if (!req.headers.authorization) return;
+  if (!checkToken(req)) return;
   const likesData = await client
     .from("videos")
     .select("likes")
@@ -269,7 +285,7 @@ app.post("/api/like/:id", async (req, res) => {
 
 // Dislike a video
 app.post("/api/dislike/:id", async (req, res) => {
-  if (!req.headers.authorization) return;
+  if (!checkToken(req)) return;
   const dislikesData = await client
     .from("videos")
     .select("dislikes")
@@ -294,6 +310,8 @@ app.get("/api/userVideos/:id", async (req, res) => {
 app.post("/api/upload", upload.fields([
   { name: 'video' }, { name: 'thumbnail' }
 ]), async (req, res) => {
+  if(!checkBodyVideo(req.body)) return res.sendStatus(400);
+  if(!checkToken(req)) return;
   await client.from("videos").insert({
     id: req.body.id,
     uploaded_at: new Date().toISOString,
@@ -316,7 +334,9 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-function checkToken(token) {
+function checkToken(req) {
+  const token = req.cookies["token"]
+  
   if (token == undefined) return;
   if (token == null) return;
   if (token.trim() == "") return;
@@ -337,3 +357,9 @@ const nanoid = (length) => {
   return id;
 }
 
+function checkBodyVideo(body) {
+  if(body.title.trim() == "") return false;
+  if(body.uploader.trim() == "") return false;
+  if(body.id.trim() == "") return false;
+  return true;
+}

@@ -1,11 +1,7 @@
 // Gets all the videos uploaded to SkibidiHub
 async function getAllVideos() {
 
-  return await axios.get("/api/getAllVideos", {
-    headers: {
-      'Authorization': getToken(Cookies.get("user")),
-    }
-  }).then(response => {
+  return await axios.get("/api/getAllVideos").then(response => {
     return response.data;
   }).catch(error => {
     throw new Error(`getAllVideos() error: ${error}`);
@@ -50,14 +46,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function makeVideo(id, info) {
-  const thumbnail = URL.createObjectURL(await getThumbnail(id));
-
   const video = document.createElement("div");
   video.classList.add("video");
 
   const img = document.createElement("img");
   img.classList.add("thumbnail");
-  img.setAttribute("src", thumbnail);
+  img.setAttribute("src", `/api/thumbnail/${id}`);
   img.onclick = function (event) {
     window.location.pathname = `/video/${id}`;
   };

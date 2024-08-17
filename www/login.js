@@ -18,5 +18,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function login(user) {
-  document.cookie = `user=${user}`;
+  Cookies.set("user", user);
+  Cookies.set("token", getToken(user));
+}
+
+function getToken(user) {
+  if(user == undefined || user == null) {
+    return "peepeecaca unauthorized";
+  }
+  return (
+    user + "*&*&*&*&&&&*&&&&*&****&***&*nexacopicloves15yearoldchineseboys"
+  );
 }

@@ -1,16 +1,3 @@
-async function getVideo(id) {
-  return await axios.get(`/api/video/${id}`, {
-    headers: {
-      "Authorization": getToken(Cookies.get("user"))
-    },
-    responseType: "blob"
-  }).then(response => {
-    return response.data;
-  }).catch(error => {
-    throw new Error(`getVideo() error: ${error}`)
-  });
-}
-
 async function getAllUserVideos(userID) {
   return axios.get(`/api/userVideos/${userID}`).then(response => {
     return response.data;
@@ -19,25 +6,9 @@ async function getAllUserVideos(userID) {
   })
 }
 
-async function getThumbnail(id) {
-  return await axios.get(`/api/thumbnail/${id}`, { 
-    responseType: "blob",
-    headers: {
-      'Authorization': getToken(Cookies.get("user"))
-    }
-  }).then(response => {
-    return response.data;
-  }).catch(error => {
-    throw new Error(`getThumbnail() error: ${error}`);
-  })
-}
-
 async function getInfo(id) {
   return await axios.get(`/api/videoInfo/${id}`, {
     responseType: "json",
-    headers: {
-      "Authorization": getToken(Cookies.get("user"))
-    }
   }).then(response => {
     return response.data;
   }).catch(error => {
@@ -46,11 +17,7 @@ async function getInfo(id) {
 }
 
 async function getComments(id) {
-  return await axios.get(`/api/comments/${id}`, {
-    headers: {
-      'Authorization': getToken(Cookies.get("user"))
-    }
-  }).then(response => {
+  return await axios.get(`/api/comments/${id}`).then(response => {
     return response.data;
   }).catch(error => {
     throw new Error(`getComments() error: ${error}`)

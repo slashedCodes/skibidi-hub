@@ -1,3 +1,5 @@
+
+
 let liked = false;
 let disliked = false;
 
@@ -11,11 +13,7 @@ async function like(id) {
       "you already like video you can not like it anymore beacuse you aleady like video!!!"
     );
   
-  axios.post(`/api/like/${id}`, {}, {
-    headers: {
-      'Authorization': getToken(Cookies.get("user"))
-    }
-  }).then(response => {
+  axios.post(`/api/like/${id}`, {}).then(response => {
     if (response.data.status == 204) {
       liked = true;
       document.getElementById("video-likes").innerText =
@@ -39,11 +37,7 @@ async function dislike(id) {
       "you already dislike video you can not dislike it anymore beacuse you aleady dislike video!!!"
     );
   
-  axios.post(`/api/dislike/${id}`, {}, {
-    headers: {
-      'Authorization': getToken(Cookies.get("user"))
-    }
-  }).then(response => {
+  axios.post(`/api/dislike/${id}`, {}).then(response => {
     if (response.data.status == 204) {
       disliked = true;
       document.getElementById("video-dislikes").innerText =
@@ -95,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }).then(response => {
         if (response.data.status == 201) {
+          document.getElementById("comment-textarea").innerText = ""
           makeComment(Cookies.get("user"), "right now", json["text"]);
         } else {
           alert("ERROR ERROR ERROR ERORROR SERVCER ERROR!!!");
@@ -103,56 +98,47 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error(`comment error: ${error}`)
       })
     });
+  // Load video
 
-  getVideo(id).then((blob) => {
-    // Load video
-    let source = document.createElement("source");
-    console.log(blob);
-    source.setAttribute("src", URL.createObjectURL(blob));
-    source.setAttribute("type", "video/mp4");
-    video.appendChild(source);
+  let source = document.createElement("source");
+  source.setAttribute("src", `/api/video/${id}`)
+  source.setAttribute("type", "video/mp4");
+  video.appendChild(source);
 
-    // Load video thumbnail
-    getThumbnail(id).then((blob) => {
-      console.log(URL.createObjectURL(blob));
-      video.setAttribute("poster", URL.createObjectURL(blob));
-    });
+  video.setAttribute("poster", `/api/thumbnail/${id}`);
 
-    // Load video info
-    getInfo(id).then((info) => {
-      console.log(info)
-
-      document.getElementById("video-title").innerText = info.title;
-      document.getElementById(
-        "video-author"
-      ).innerText = `Uploaded by: ${info.uploader}`;
-      document.getElementById("video-author").onclick = function(event) {
-        window.location.pathname = `/user/${info.uploader}`
-      }
-      document.getElementById("video-date").innerText =
-        parseTimestamp(info.uploaded_at).date +
-        " " +
-        parseTimestamp(info.uploaded_at).timestamp;
-      document.getElementById("video-description").innerText = info.description;
-      document.getElementById("video-likes").innerText = info.likes;
-      document.getElementById("video-dislikes").innerText = info.dislikes;
-    });
-
-    // Load comments
-    getComments(id).then((comments) => {
-      comments.forEach((comment) => {
-        makeComment(
-          comment.commenter,
-          parseTimestamp(comment.created_at).date +
-            " " +
-            parseTimestamp(comment.created_at).timestamp,
-          comment.text
-        );
-      });
-    });
-
-    document.getElementById("loading").classList.add("disabled")
+  // Load video info
+  getInfo(id).then((info) => {
+    document.getElementById("video-title").innerText = info.title;
+    document.getElementById(
+      "video-author"
+    ).innerText = `Uploaded by: ${info.uploader}`;
+    document.getElementById("video-author").onclick = function(event) {
+      window.location.pathname = `/user/${info.uploader}`
+    }
+    document.getElementById("video-date").innerText =
+      parseTimestamp(info.uploaded_at).date +
+      " " +
+      parseTimestamp(info.uploaded_at).timestamp;
+    document.getElementById("video-description").innerText = info.description;
+    document.getElementById("video-likes").innerText = info.likes;
+    document.getElementById("video-dislikes").innerText = info.dislikes;
   });
+
+  // Load comments
+  getComments(id).then((comments) => {
+    comments.forEach((comment) => {
+      makeComment(
+        comment.commenter,
+        parseTimestamp(comment.created_at).date +
+          " " +
+          parseTimestamp(comment.created_at).timestamp,
+        comment.text
+      );
+    });
+  });
+
+  document.getElementById("loading").classList.add("disabled")
 });
 
 function makeComment(username, timestamp, content) {

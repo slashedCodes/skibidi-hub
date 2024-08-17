@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
+
+    <meta content="Home - Skibidihub" property="og:title" />
+    <meta content="Skibidihub is the perfect site for all of your skibidi fnaf XXX needs! skibiihub will satisfy your needs! " property="og:description" />
+    <!-- Yes you need to set the domain manually for every html file. No i dont care and i cant fix it -->
+    <meta content="http://192.168.194.154:3000/" property="og:url" id="embed-url" />
+    <meta content="http://192.168.194.154:3000/api/thumbnail/a" property="og:image" id="embed-image" />
+    <meta name="twitter:card" content="summary_large_image">
+
     <title>SkibidiHub - Home</title>
   </head>
   <body>
@@ -29,7 +37,7 @@
         Upload
       </button>
       <button id="account-button" onclick="window.location.pathname = `/user/${Cookies.get('user')}`" class="login disabled">My Account</button>
-      <button id="logout-button" onclick="Cookies.remove('user'); window.location.reload()" class="login disabled">Logout</button>
+      <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
     </div>
 
     <h1>Recomended videos:</h1>

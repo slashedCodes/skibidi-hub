@@ -3,8 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet" />
     <link href="../style.css" rel="stylesheet" />
+
+    <meta content="Video - Skibidihub" property="og:title" />
+    <meta content="Skibidihub is the perfect site for all of your skibidi fnaf XXX needs! skibiihub will satisfy your needs! " property="og:description" />
+    <!-- Yes you need to set the domain manually for every html file. No i dont care and i cant fix it -->
+    <meta content="http://192.168.194.154:3000/" property="og:url" id="embed-url" />
+    <meta content="http://192.168.194.154:3000/api/thumbnail/a" property="og:image" id="embed-image" />
+    <meta name="twitter:card" content="summary_large_image">
+
     <title>▶️SkibidiHub - Video</title>
   </head>
   <body>
@@ -29,22 +36,11 @@
         Upload
       </button>
       <button id="account-button" onclick="window.location.pathname = `/user/${Cookies.get('user')}`" class="login disabled">My Account</button>
-      <button id="logout-button" onclick="Cookies.remove('user'); window.location.reload()" class="login disabled">Logout</button>
+      <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
     </div>
     <div class="video-container">
-      <video
-        id="video"
-        class="video-js video-video"
-        controls
-        preload="auto"
-        data-setup="{}"
-      >
-        <p class="vjs-no-js">
-          bro wtf are u watching this on? the fucking wii browser? 3ds browser?
-          fucking nintendo switch facebook embed? you have no js and thats a
-          skill issue
-        </p>
-      </video>
+
+      <video id="video" class="video-video" controls></video>
 
       <img src="./../assets/loading.gif" width="300" id="loading">
     </div>
@@ -87,6 +83,7 @@
           rows="5"
           cols="50"
           placeholder="Comment here what you think about the video!"
+          id="comment-textarea"
         >
         </textarea>
         <br />
@@ -97,7 +94,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
-    <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
     <script src="./../utils.js"></script>
     <script src="./../video.js"></script>
   </body>
