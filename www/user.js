@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const id = decodeURI(window.location.pathname.split("/")[2]);
+  document.getElementById("account-button-anchor").href = `/user/${Cookies.get('user')}`
 
   document.getElementById(
     "no-videos"
@@ -28,15 +29,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function makeVideo(id, info) {
-  const video = document.createElement("div");
+  const video = document.createElement("a");
+  video.href = `/video/${id}`
   video.classList.add("video");
 
   const img = document.createElement("img");
   img.classList.add("thumbnail");
   img.setAttribute("src", `/api/thumbnail/${id}`);
-  img.onclick = function (event) {
-    window.location.pathname = `/video/${id}`;
-  };
   video.appendChild(img);
 
   const videoInfoContainer = document.createElement("div");
@@ -56,12 +55,10 @@ async function makeVideo(id, info) {
   };
   videoInfoContainer.appendChild(videoTitle);
 
-  const videoUploader = document.createElement("p");
+  const videoUploader = document.createElement("a");
+  videoUploader.href = `/user/${info.uploader}`
   videoUploader.classList.add("video-uploader");
   videoUploader.innerText = `published by: ${info.uploader}`;
-  videoUploader.onclick = function (event) {
-    window.location.pathname = `/user/${info.uploader}`;
-  };
   videoInfoContainer.appendChild(videoUploader);
 
   document.getElementById("videos").appendChild(video);

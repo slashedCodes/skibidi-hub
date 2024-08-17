@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let video = document.getElementById("video");
   let id = window.location.pathname.split("/")[2];
 
+  document.getElementById("account-button-anchor").href = `/user/${Cookies.get('user')}`
   if (Cookies.get("user") != null) {
     document.getElementById("login-button").classList.add("disabled");
     document.getElementById("logout-button").classList.remove("disabled");
@@ -113,9 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(
       "video-author"
     ).innerText = `Uploaded by: ${info.uploader}`;
-    document.getElementById("video-author").onclick = function(event) {
-      window.location.pathname = `/user/${info.uploader}`
-    }
+    document.getElementById("video-author-anchor").href = `/user/${info.uploader}`;
     document.getElementById("video-date").innerText =
       parseTimestamp(info.uploaded_at).date +
       " " +
@@ -149,14 +148,16 @@ function makeComment(username, timestamp, content) {
   commentSpan.setAttribute("class", "comment-span");
   comment.appendChild(commentSpan);
 
+
+  let userAnchor = document.createElement("a");
+  userAnchor.href = `/user/${username}`;
+  userAnchor.classList.add("clickable-user")
+  commentSpan.appendChild(userAnchor);
+
   let user = document.createElement("h2");
   user.innerText = username;
-  //user.setAttribute("onclick", `gotoUser(${username})`);
-  user.onclick = function (event) {
-    window.location.pathname = `/user/${username}`;
-  };
   user.setAttribute("class", "clickable-user");
-  commentSpan.appendChild(user);
+  userAnchor.appendChild(user);
 
   let date = document.createElement("h6");
   date.innerText = timestamp;

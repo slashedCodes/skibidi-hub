@@ -42,6 +42,7 @@ body {
 
 .video {
   color: orange;
+  text-decoration: none;
 }
 
 .video-video {
@@ -114,6 +115,7 @@ body {
 }
 
 .clickable-user {
+  color: white;
   text-decoration: double;
 }
 
@@ -166,6 +168,8 @@ body {
   color: brown;
   font-family: cursive;
   user-select: none;
+  text-decoration: none;
+  margin-block-start: 1em;
 }
 
 .video-uploader:hover {
@@ -215,8 +219,17 @@ body {
   font-weight: 100;
 }
 
+.video-author {
+  color: white;
+  text-decoration: none;
+}
+
 .video-author:hover {
   color: purple;
   text-decoration: overline;
   cursor: pointer;
+}
+
+.anchor {
+  text-decoration: none;
 }

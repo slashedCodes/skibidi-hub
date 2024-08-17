@@ -17,25 +17,23 @@
   <body>
     <div class="navbar">
       <div class="navbar-spacer"></div>
-      <img class="navbar-img" onclick="window.location.pathname = '/'" src="../assets/logo.png" />
+      <a href="/"><img class="navbar-img" src="../assets/logo.png" /></a>
       <div class="navbar-spacer"></div>
       <h1>The site for all of your skibidi fnaf XXX needs!</h1>
       <div class="navbar-spacer"></div>
-      <button
-        onclick="window.location.pathname = `/login`"
-        class="login"
-        id="login-button"
-      >
-        Login
-      </button>
-      <button
-        id="upload-button"
-        onclick="window.location.pathname = `/upload`"
-        class="login disabled"
-      >
-        Upload
-      </button>
-      <button id="account-button" onclick="window.location.pathname = `/user/${Cookies.get('user')}`" class="login disabled">My Account</button>
+
+      <a class="anchor" href="/login">
+        <button class="login" id="login-button">Login</button>
+      </a>
+
+      <a href="/upload" class="anchor">
+        <button id="upload-button" class="login disabled">Upload</button>
+      </a>
+      
+      <a class="anchor" id="account-button-anchor">
+        <button id="account-button" class="login disabled">My Account</button>
+      </a>
+
       <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
     </div>
     <div class="video-container">
@@ -48,7 +46,7 @@
     <div class="video-info">
       <h1 id="video-title">LOADING</h1>
       <div class="video-actions">
-        <h2 id="video-author" class="video-author">LOADING</h2>
+        <a id="video-author-anchor" class="video-author"><h2 id="video-author" class="video-author">LOADING</h2></a>
         <div class="navbar-spacer"></div>
         <button
           class="like"
