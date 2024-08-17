@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
 
         data.set("uploader", Cookies.get("user"));
-        data.set("id", nanoid(7));
+        if(data.get("id") == "") {
+            data.set("id", nanoid(7));
+        }
 
         axios.post("/api/upload", data, {
             headers: {

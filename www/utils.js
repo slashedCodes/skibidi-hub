@@ -46,7 +46,11 @@ async function getInfo(id) {
 }
 
 async function getComments(id) {
-  return await axios.get(`/api/comments/${id}`).then(response => {
+  return await axios.get(`/api/comments/${id}`, {
+    headers: {
+      'Authorization': getToken(Cookies.get("user"))
+    }
+  }).then(response => {
     return response.data;
   }).catch(error => {
     throw new Error(`getComments() error: ${error}`)

@@ -41,7 +41,11 @@ body {
 
 .video {
   color: orange;
-  height: 50vh;
+}
+
+.video-video {
+  color: orange;
+  height: 60vh;
 }
 
 .video-container {
@@ -197,7 +201,7 @@ body {
 .videos {
   display: grid;
   column-gap: 10px;
-  row-gap: 10px;
+  row-gap: 50px;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   padding: 10px;
 }

@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage });
 
-const titleList = [
+const fakeTitleList = [
   "CHICA added BBQ SAUCE to the mcdonalds FOOTJOB!!!",
   "FREDDY's bubble GYATT bounces on my BBC and breaks it in TWO PIECES!!!",
   "MONTY gets the PROFESSIONAL hawk tuah GOP GOP!!!",
@@ -36,6 +36,21 @@ const titleList = [
   "CHICA does OZEMPIC MUKBANG!!!!",
   "FOXY LICKS MY TOES ASMR!!!!",
   "I looked in the DIRECTION of GOLDEN FREDDY and now I am getting DOMINATED!!!"
+]
+
+const fakeCommentList = [
+  "I would LOVE that gyatt on my dingaling dear 🤭",
+  "Those tiddies are blinding dear 😎",
+  "I have a big cock just for you darling 🤗",
+  "I love chica i want to touch her everywhere inappropriately! 🤪",
+  "I would love for funtime foxy to give me head 🥵",
+  "You have the perfect body dear 😏😶‍🌫️",
+  "please suck on my dick  you are so hot i love you 🥵🥵🥵🥵",
+  "Am i not enough for you, freddy? 😥",
+  "Am i not enough for you, chica? 😥",
+  "I would love to clap those bootycheeks of yours 🥵 lets say my tongue is good aswell 👅",
+  "Only if my wife was like you... 😥 i wish...",
+  "you look Beautiful darling, how about you consider contacting me? 🤪🤭"
 ]
 
 const client = supabase.createClient(
@@ -132,19 +147,24 @@ app.get("/api/videoInfo/:id", (req, res) => {
     .select()
     .eq("id", req.params.id)
     .then((data) => {
+      if(checkToken(req.headers.authorization)) {
+        res.send(data["data"][0]);
+      } else {
+        let newData = {};
+        newData.title = fakeTitleList[getRandomInt(fakeTitleList.length)]
+        newData.description = "SIGN IN to see this EPIC content"
+        newData.likes = "69"
+        newData.dislikes = "0"
+        newData.uploader = "SIGN IN to see this EPIC content"
+        newData.uploaded_at = new Date().toISOString().toString();
+        res.send(newData);
+        return
+      }
+
       if (data.error) {
         res.sendStatus(400);
       } else if (data.status != 200) {
         res.sendStatus(data.status);
-      }
-
-      if(checkToken(req.headers.authorization)) {
-        res.send(data["data"][0]);
-      } else {
-        let newData = data["data"][0];
-        newData.description = "SIGN IN to see this EPIC content"
-        newData.title = titleList[getRandomInt(titleList.length)]
-        res.send(newData);
       }
     });
 });
@@ -156,6 +176,23 @@ app.get("/api/comments/:videoID", (req, res) => {
     .select()
     .eq("video_id", req.params.videoID)
     .then((data) => {
+      if(!checkToken(req.headers.authorization)) {
+        let comments = [];
+        for(let i = 0; i < 8; i++) {
+          let comment = {};
+          comment.text = fakeCommentList[getRandomInt(fakeCommentList.length)]
+          comment.commenter = "SIGN IN to see this EPIC content!";
+          let date = new Date();
+          date.setTime(1005286084);
+          comment.created_at = date.toISOString();
+          comments.push(comment);
+        }
+
+        console.log(comments)
+        res.send(comments);
+        return;
+      }
+
       if (data.error) {
         res.sendStatus(400);
       } else if (data.status != 200) {
@@ -182,12 +219,14 @@ app.get("/api/getAllVideos", (req, res) => {
         res.send(data["data"]);
       } else {
         let newData = [];
-        data.data.forEach(video => {
-          let temp = video;
+        for(let i = 0; i < 30; i++) {
+          let temp = {};
           temp.description = "SIGN IN to see this EPIC content"
-          temp.title = titleList[getRandomInt(titleList.length)]
+          temp.title = fakeTitleList[getRandomInt(fakeTitleList.length)]
+          temp.uploader = "SIGN IN to see this EPIC content";
+          temp.id = nanoid(7);
           newData.push(temp);
-        })
+        }
 
         res.send(newData);
       }
@@ -199,10 +238,6 @@ app.get("/api/getAllVideos", (req, res) => {
 app.post("/api/comment", async (req, res) => {
   if (!checkToken(req.headers.authorization)) return;
   const id = await client.from("comments").select();
-
-  console.log(
-    `New comment: videoID: ${req.body["videoID"]} text: ${req.body["text"]} commenter: ${req.body["commenter"]}`
-  );
 
   client
     .from("comments")
@@ -261,7 +296,6 @@ app.get("/api/userVideos/:id", async (req, res) => {
 app.post("/api/upload", upload.fields([
   { name: 'video' }, { name: 'thumbnail' }
 ]), async (req, res) => {
-  console.log(req.body)
   await client.from("videos").insert({
     id: req.body.id,
     uploaded_at: new Date().toISOString,
@@ -295,3 +329,13 @@ function checkToken(token) {
     return false;
   }
 }
+const nanoid = (length) => {
+  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let id = '';
+  for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      id += characters[randomIndex];
+  }
+  return id;
+}
+

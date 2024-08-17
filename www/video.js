@@ -111,6 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Load video info
     getInfo(id).then((info) => {
+      console.log(info)
+
       document.getElementById("video-title").innerText = info.title;
       document.getElementById(
         "video-author"
