@@ -47,3 +47,7 @@ textarea {
     font-size: 17px;
     font-family: cursive;
 }
+
+.disabled {
+    display: none;
+}

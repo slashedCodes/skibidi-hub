@@ -13,20 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("You need to be logged in to upload videos!");
         window.location.pathname = "/";
     }
-    const form = document.getElementById("form");
-    const data = new FormData(form);
 
-    const id = nanoid(7);
-    form.addEventListener("submit", (event) => {
+    document.getElementById("form").addEventListener("submit", (event) => {
+        const data = new FormData(document.getElementById("form"));
         event.preventDefault();
-        axios.post("/api/upload", {
-            id: id,
-            title: data.get("title"),
-            description: data.get("description"),
-            uploader: Cookies.get("user"),
-            video: data.get("video"),
-            thumbnail: data.get("thumbnail"),
-        }, {
+
+        data.set("uploader", Cookies.get("user"));
+        data.set("id", nanoid(7));
+
+        axios.post("/api/upload", data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': getToken(Cookies.get("user"))
@@ -36,14 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const percent = (event.loaded / event.total) * 100
                 if(percent === 100) {
                     alert("video was uploaded successfully!")
-                    window.location.pathname = `/video/${id}`
                 }
 
                 document.getElementById("progress-bar").setAttribute('value', percent);
                 document.getElementById("progress").innerText = `${percent}%`
             },
-        }).then(response => {
-            console.log(response);
         }).catch(error => {
             throw new Error(`upload error: ${error}`);
         })

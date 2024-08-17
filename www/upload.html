@@ -9,17 +9,20 @@
 <body>
     <div class="container">
         <form id="form" class="form">
-            <label for="video">video (must be .mp4)</label> <br />
-            <input type="file" name="video" accept="video/mp4"> <br />
-            
-            <label for="thumbnail">thumbnail (must be .jpg)</label> <br />
-            <input type="file" name="thumbnail" accept="image/jpeg"> <br />
+            <input type="text" name="uploader" class="disabled">
+            <input type="text" name="id" class="disabled">
 
             <label for="title">video title</label> <br />
             <input type="text" name="title"> <br />
 
             <label for="description">video description</label> <br />
             <textarea name="description" rows="20"></textarea> <br />
+
+            <label for="video">video (must be .mp4)</label> <br />
+            <input type="file" name="video" accept="video/mp4"> <br />
+            
+            <label for="thumbnail">thumbnail (must be .jpg)</label> <br />
+            <input type="file" name="thumbnail" accept="image/jpeg"> <br />
 
             <input type="submit" value="upload">
         </form>

@@ -10,7 +10,7 @@ require("dotenv").config();
 const port = 3000;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    console.log(req);
+    //console.log(req);
     if(!fs.existsSync(path.join(__dirname, path.join("videos", req.body.id)))) {
       fs.mkdirSync(path.join(__dirname, path.join("videos", req.body.id)))
     }
@@ -261,6 +261,7 @@ app.get("/api/userVideos/:id", async (req, res) => {
 app.post("/api/upload", upload.fields([
   { name: 'video' }, { name: 'thumbnail' }
 ]), async (req, res) => {
+  console.log(req.body)
   await client.from("videos").insert({
     id: req.body.id,
     uploaded_at: new Date().toISOString,
