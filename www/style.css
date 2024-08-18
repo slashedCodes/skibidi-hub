@@ -233,3 +233,23 @@ body {
 .anchor {
   text-decoration: none;
 }
+
+.spacer {
+  height: 100px;
+}
+
+.footer {
+  background-color: orange;
+  color: black;
+  padding: 20px;
+}
+
+.footer a {
+  color: black;
+}
+
+.footer a:hover {
+  color: white;
+  cursor: pointer;
+  text-decoration: overline;
+}

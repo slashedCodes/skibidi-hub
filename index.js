@@ -79,6 +79,10 @@ app.get("/upload", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "upload.html")));
 })
 
+app.get("/contact", (req, res) => {
+  res.sendFile(path.join(__dirname, path.join("www", "contact.html")));
+})
+
 app.get("/video/:id", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "video.html")));
 });
@@ -354,8 +358,8 @@ app.post("/api/upload", upload.fields([
     description: req.body.description,
     title: req.body.title,
     uploader: req.body.uploader
-  })
-
+  }).then(data => {
+    
   // Discord webhook
   sendWebhook(
     `new video guys`,
@@ -365,7 +369,7 @@ app.post("/api/upload", upload.fields([
         "id": 220464536,
         "description": req.body.description,
         "fields": [],
-        "title": "New video guys!!!",
+        "title": req.body.title,
         "author": {
           "name": req.body.uploader,
           "url": `http://skibidihub.buttplugstudios.xyz/user/${req.body.uploader}`
@@ -378,6 +382,7 @@ app.post("/api/upload", upload.fields([
       }
     ]
   )
+  })
 })
 
 

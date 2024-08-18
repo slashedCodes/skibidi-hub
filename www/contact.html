@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <title>Skibidihub - Contact</title>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-spacer"></div>
+        <a href="/"><img class="navbar-img" src="../assets/logo.png" /></a>
+        <div class="navbar-spacer"></div>
+        <h1>The site for all of your skibidi fnaf XXX needs!</h1>
+        <div class="navbar-spacer"></div>
+        <a class="anchor" href="/login">
+          <button class="login" id="login-button">Login</button>
+        </a>
+  
+        <a href="/upload" class="anchor">
+          <button id="upload-button" class="login disabled">Upload</button>
+        </a>
+        
+        <a class="anchor" id="account-button-anchor">
+          <button id="account-button" class="login disabled">My Account</button>
+        </a>
+        <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+    </div>
+
+    <h1>Contact</h1>
+    <hr />
+
+    <p>The skibidihub team appreciates your trying to contact us.</p>
+    <p>Here is the email you need to contact to contact the skibidihub team to contact us: </p>
+    <h2>slashed(at)buttplugstudios(dot)xyz</h2>
+
+    <p>thank you for contacting us to contact the skibdihub team, to contact us.</p>
+
+    <script src="contact.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
+</body>
+</html>
