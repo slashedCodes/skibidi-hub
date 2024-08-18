@@ -337,10 +337,11 @@ app.post("/api/dislike/:id", async (req, res) => {
 });
 
 app.get("/api/userVideos/:id", async (req, res) => {
+  console.log(decodeURIComponent(req.params.id))
   const data = await client
     .from("videos")
     .select()
-    .eq("uploader", req.params.id);
+    .eq("uploader", decodeURIComponent(req.params.id));
   res.send(data);
 });
 
@@ -372,7 +373,7 @@ app.post("/api/upload", upload.fields([
         "title": req.body.title,
         "author": {
           "name": req.body.uploader,
-          "url": `http://skibidihub.buttplugstudios.xyz/user/${req.body.uploader}`
+          "url": `http://skibidihub.buttplugstudios.xyz/user/${encodeURIComponent(req.body.uploader)}`
         },
         "url": `http://skibidihub.buttplugstudios.xyz/video/${req.body.id}`,
         "color": 9830655,

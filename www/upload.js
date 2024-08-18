@@ -8,6 +8,8 @@ const nanoid = (length) => {
     return id;
 }
 
+let id = nanoid(7);
+
 document.addEventListener("DOMContentLoaded", () => {
     if(Cookies.get("user") == null || Cookies.get("user") == undefined) {
         alert("You need to be logged in to upload videos!");
@@ -19,10 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
 
         data.set("uploader", Cookies.get("user"));
-        if(data.get("id") == "") {
-            data.set("id", nanoid(7));
-        }
-
+        data.set("id", id);
+        
         if(data.get("thumbnail").size < 1) return alert("Please enter valid form data");
         if(data.get("video").size < 1) return alert("Please enter valid form data");
         if(data.get("title").trim() == "") return alert("Please enter valid form data");

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const id = decodeURI(window.location.pathname.split("/")[2]);
+  const id = decodeURIComponent(window.location.pathname.split("/")[2]);
   document.getElementById("account-button-anchor").href = `/user/${Cookies.get('user')}`
 
   document.getElementById(
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "⚠️⚠️⚠️⚠️SIGN IN to see this EPIC content❌❌💋🩻";
   }
 
-  const videos = await getAllUserVideos(id)
+  const videos = await getAllUserVideos(encodeURIComponent(id))
   document.getElementById("loading").classList.add("disabled");
   if (videos.data.length > 0) {
     videos.data.forEach((video) => {
@@ -56,7 +56,7 @@ async function makeVideo(id, info) {
   videoInfoContainer.appendChild(videoTitle);
 
   const videoUploader = document.createElement("a");
-  videoUploader.href = `/user/${info.uploader}`
+  videoUploader.href = `/user/${encodeURIComponent(info.uploader)}`
   videoUploader.classList.add("video-uploader");
   videoUploader.innerText = `published by: ${info.uploader}`;
   videoInfoContainer.appendChild(videoUploader);
