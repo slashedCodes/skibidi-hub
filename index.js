@@ -362,8 +362,8 @@ app.post("/api/upload", upload.fields([
     
   // Discord webhook
   sendWebhook(
-    `new video guys`,
-    "New UPLOAD!!!!! <@&1274653503448678440>",
+    `new video guys <@&1274653503448678440>`,
+    "New UPLOAD!!!!",
     [
       {
         "id": 220464536,

@@ -79,6 +79,7 @@ async function makeVideo(id, info) {
 
 
   const videoUploader = document.createElement("a");
+  console.log(encodeURI(info.uploader))
   videoUploader.href = `/user/${info.uploader}`
   videoUploader.classList.add("video-uploader");
   videoUploader.innerText = `published by: ${info.uploader}`;
