@@ -97,12 +97,6 @@ app.get("/user/:user", (req, res) => {
 app.get("/api/video/:id", function (req, res) {
   const range = req.headers.range;
 
-  const videoPath = path.join(__dirname, path.join("videos", path.join(req.params.id, "video.mp4")));
-  if(!fs.existsSync(videoPath)) return res.sendStatus(404);
-  if (!range) {
-    return res.sendFile(videoPath);
-  }
-
   if(!checkToken(req, "/api/video/:id")) {
     return res.sendFile(
       path.join(
@@ -110,6 +104,12 @@ app.get("/api/video/:id", function (req, res) {
         path.join("www", path.join("assets", path.join("troll", "video.mp4")))
       )
     );
+  }
+
+  const videoPath = path.join(__dirname, path.join("videos", path.join(req.params.id, "video.mp4")));
+  if(!fs.existsSync(videoPath)) return res.sendStatus(404);
+  if (!range) {
+    return res.sendFile(videoPath);
   }
   
   const videoSize = fs.statSync(videoPath).size;
