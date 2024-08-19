@@ -96,8 +96,11 @@ app.get("/user/:user", (req, res) => {
 // Get an mp4 file according to its video ID.
 app.get("/api/video/:id", function (req, res) {
   const range = req.headers.range;
+
+  const videoPath = path.join(__dirname, path.join("videos", path.join(req.params.id, "video.mp4")));
+  if(!fs.existsSync(videoPath)) return res.sendStatus(404);
   if (!range) {
-    return res.status(400).send("Requires Range header");
+    res.sendFile(videoPath);
   }
 
   if(!checkToken(req, "/api/video/:id")) {
@@ -108,9 +111,6 @@ app.get("/api/video/:id", function (req, res) {
       )
     );
   }
-
-  const videoPath = path.join(__dirname, path.join("videos", path.join(req.params.id, "video.mp4")));
-  if(!fs.existsSync(videoPath)) return res.sendStatus(404);
   
   const videoSize = fs.statSync(videoPath).size;
   const CHUNK_SIZE = 10 ** 6;
