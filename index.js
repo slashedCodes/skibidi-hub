@@ -100,7 +100,7 @@ app.get("/api/video/:id", function (req, res) {
   const videoPath = path.join(__dirname, path.join("videos", path.join(req.params.id, "video.mp4")));
   if(!fs.existsSync(videoPath)) return res.sendStatus(404);
   if (!range) {
-    res.sendFile(videoPath);
+    return res.sendFile(videoPath);
   }
 
   if(!checkToken(req, "/api/video/:id")) {
