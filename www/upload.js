@@ -34,14 +34,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             onUploadProgress: function(event) {
                 const percent = (event.loaded / event.total) * 100
-                if(percent === 100) {
-                    alert("video was uploaded successfully!")
-                }
 
                 document.getElementById("progress-bar").setAttribute('value', percent);
                 document.getElementById("progress").innerText = `${percent}%`
             },
+        }).then(data => {
+            console.log(data);
         }).catch(error => {
+            console.log(error)
+            if(error.response) {
+                alert(error.response.data.message)
+            }
             throw new Error(`upload error: ${error}`);
         })
     })

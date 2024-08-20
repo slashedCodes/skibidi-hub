@@ -99,13 +99,12 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error(`comment error: ${error}`)
       })
     });
+  
   // Load video
-
   let source = document.createElement("source");
   source.setAttribute("src", `/api/video/${id}`)
   source.setAttribute("type", "video/mp4");
   video.appendChild(source);
-
   video.setAttribute("poster", `/api/thumbnail/${id}`);
 
   // Load video info
@@ -114,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(
       "video-author"
     ).innerText = `Uploaded by: ${info.uploader}`;
-    document.getElementById("video-author-anchor").href = `/user/${info.uploader}`;
+    document.getElementById("video-author-anchor").href = `/user/${encodeURIComponent(info.uploader)}`;
     document.getElementById("video-date").innerText =
       parseTimestamp(info.uploaded_at).date +
       " " +
@@ -148,9 +147,8 @@ function makeComment(username, timestamp, content) {
   commentSpan.setAttribute("class", "comment-span");
   comment.appendChild(commentSpan);
 
-
   let userAnchor = document.createElement("a");
-  userAnchor.href = `/user/${username}`;
+  userAnchor.href = `/user/${encodeURIComponent(username)}`;
   userAnchor.classList.add("clickable-user")
   commentSpan.appendChild(userAnchor);
 
