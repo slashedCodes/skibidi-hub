@@ -14,59 +14,40 @@ const port = 3000;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     try {
-      if(!utils.checkBodyVideo(req.body)) throw new Error("invalid video body");
-      if(!utils.checkToken(req, "/api/upload multer")) throw new Error("unauthorized");
-      req.video_id = nanoid(7);
-      if(!utils.videoExists(req.video_id)) {
-        fs.mkdirSync(path.join(__dirname, path.join("videos", req.video_id)))
+      // Validations
+      if (!utils.checkBodyVideo(req.body)) throw new Error("invalid video body");
+      if (!utils.checkToken(req, "/api/upload multer")) throw new Error("unauthorized");
+
+      if(!req.skibidihub_id) req.skibidihub_id = utils.nanoid(7);
+      console.log("Video ID:", req.skibidihub_id);
+
+      // Check if the directory exists, and create it if it doesn't
+      const dir = path.join(__dirname, "videos", req.skibidihub_id);
+      if (!utils.videoExists(req.skibidihub_id)) {
+        console.log("Directory does not exist, creating:", dir);
+        fs.mkdirSync(dir, { recursive: true });
       }
-      if(file.fieldname == "video" && !utils.checkFile(file, /mp4|webm/)) throw new Error("invalid video type");
-      if(file.fieldname == "thumbnail" && !utils.checkFile(file, /jpg|jpeg|png|gif/)) throw new Error("invalid thumbnail type");
-      
-      return cb(null, path.join(__dirname, path.join("videos", req.video_id)))
+
+      // Set the destination path for multer
+      cb(null, dir);
     } catch (err) {
-      return cb(err)
+      console.log("Error in destination function:", err);
+      cb(err);
     }
   },
   filename: function (req, file, cb) {
-    if(file.fieldname == "video") cb(null, file.fieldname + ".mp4");
-    if(file.fieldname == "thumbnail") cb(null, file.fieldname + ".jpg");
+    let filename;
+    if (file.fieldname === "video") {
+      filename = "video.mp4";
+    } else if (file.fieldname === "thumbnail") {
+      filename = "thumbnail.jpg";
+    }
+    console.log("Saving file with filename:", filename);
+    cb(null, filename);
   }
-})
+});
 
 const upload = multer({ storage: storage });
-
-const fakeTitleList = [
-  "CHICA added BBQ SAUCE to the mcdonalds FOOTJOB!!!",
-  "FREDDY's bubble GYATT bounces on my BBC and breaks it in TWO PIECES!!!",
-  "MONTY gets the PROFESSIONAL hawk tuah GOP GOP!!!",
-  "stepmother FOXY is hungry for COCK!!!",
-  "POV impregnate the CUPCAKE plushie with me!!!",
-  "CHICA cheated on me with the CUPCAKE and i joined IN!!!!",
-  "FREDDYS BBC got stuck in the GARBAGE DISPOSAL!!! You will NOT believe what happened next!",
-  "LEGENDARY pegging session with FUNTIME FOXY!!!",
-  "FUNTIME FOXY gives me the SLOPPY TOPPY with a TWIST!!!",
-  "CHICA does OZEMPIC MUKBANG!!!!",
-  "FOXY LICKS MY TOES ASMR!!!!",
-  "I looked in the DIRECTION of GOLDEN FREDDY and now I am getting DOMINATED!!!"
-]
-
-const fakeCommentList = [
-  "I would LOVE that gyatt on my dingaling dear 🤭",
-  "Those tiddies are blinding dear 😎",
-  "I have a big cock just for you darling 🤗",
-  "I love chica i want to touch her everywhere inappropriately! 🤪",
-  "I would love for funtime foxy to give me head 🥵",
-  "You have the perfect body dear 😏😶‍🌫️",
-  "please suck on my dick  you are so hot i love you 🥵🥵🥵🥵",
-  "Am i not enough for you, freddy? 😥",
-  "Am i not enough for you, chica? 😥",
-  "I would love to clap those bootycheeks of yours 🥵 lets say my tongue is good aswell 👅",
-  "Only if my wife was like you... 😥 i wish...",
-  "you look Beautiful darling, how about you consider contacting me? 🤪🤭"
-]
-
-const webhookURL = process.env.WEBHOOK_URL;
 const client = supabase.createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
@@ -151,7 +132,7 @@ app.get("/api/thumbnail/:id", (req, res) => {
           "www",
           path.join(
             "assets",
-            path.join("troll", images[getRandomInt(images.length - 1)])
+            path.join("troll", images[utils.getRandomInt(images.length - 1)])
           )
         )
       )
@@ -159,30 +140,16 @@ app.get("/api/thumbnail/:id", (req, res) => {
     return;
   }
 
-  if (fs.existsSync(path.join("videos", req.params.id + "/"))) {
-    res.sendFile(
-      path.join(
-        __dirname,
-        path.join("videos", path.join(req.params.id, "thumbnail.jpg"))
-      )
-    );
-  } else {
-    res.sendStatus(404);
-  }
+  const thumbnail = utils.getThumbnail(req.params.id);
+  if(thumbnail) return res.sendFile(thumbnail);
+  if(!thumbnail) return res.sendStatus(404);
 });
 
 // Get a videos thumbnail according to its video ID.
 app.get("/api/webhookThumbnail/:id", (req, res) => {
-  if (fs.existsSync(path.join("videos", req.params.id + "/"))) {
-    res.sendFile(
-      path.join(
-        __dirname,
-        path.join("videos", path.join(req.params.id, "thumbnail.jpg"))
-      )
-    );
-  } else {
-    res.sendStatus(404);
-  }
+  const thumbnail = utils.getThumbnail(req.params.id);
+  if(thumbnail) return res.sendFile(thumbnail);
+  if(!thumbnail) return res.sendStatus(404);
 });
 
 // Get the info for a video according to its video ID.
@@ -191,7 +158,7 @@ app.get("/api/videoInfo/:id", (req, res) => {
 
   if(!utils.checkToken(req, "/api/videoInfo/:id")) {
     let newData = {};
-    newData.title = fakeTitleList[getRandomInt(fakeTitleList.length)]
+    newData.title = utils.fakeTitleList[utils.getRandomInt(utils.fakeTitleList.length)]
     newData.description = "SIGN IN to see this EPIC content"
     newData.likes = "69"
     newData.dislikes = "0"
@@ -223,7 +190,7 @@ app.get("/api/comments/:videoID", (req, res) => {
     let comments = [];
     for(let i = 0; i < 8; i++) {
       let comment = {};
-      comment.text = fakeCommentList[getRandomInt(fakeCommentList.length)]
+      comment.text = utils.fakeCommentList[utils.getRandomInt(utils.fakeCommentList.length)]
       comment.commenter = "SIGN IN to see this EPIC content!";
       let date = new Date();
       date.setTime(1005286084);
@@ -256,9 +223,9 @@ app.get("/api/getAllVideos", (req, res) => {
     for(let i = 0; i < 12; i++) {
       let temp = {};
       temp.description = "SIGN IN to see this EPIC content"
-      temp.title = fakeTitleList[getRandomInt(fakeTitleList.length)]
+      temp.title = utils.fakeTitleList[utils.getRandomInt(utils.fakeTitleList.length)]
       temp.uploader = "SIGN IN to see this EPIC content";
-      temp.id = nanoid(7);
+      temp.id = utils.nanoid(7);
       newData.push(temp);
     }
 
@@ -300,7 +267,7 @@ app.post("/api/comment", async (req, res) => {
       res.send(data);
 
       // Discord webhook
-      sendWebhook(
+      utils.sendWebhook(
         "new comment guys",
         "New COMMENT!!!!!",
         [
@@ -370,13 +337,13 @@ app.get("/api/userVideos/:id", async (req, res) => {
 
 app.post("/api/upload", upload.fields([
   { name: 'video' }, { name: 'thumbnail' }
-]), multerErrorHandler, async (req, res) => {
+]), utils.multerErrorHandler, async (req, res) => {
   console.log(req.skibidihub_id);
   if(!utils.checkBodyVideo(req.body)) return res.status(400).json({ message: "invalid video body" });
   if(!utils.checkToken(req, "/api/upload")) return res.status(401).json({ message: "SIGN IN to UPLOAD videos!!!" });
 
   await client.from("videos").insert({
-    id: req.video_id,
+    id: req.skibidihub_id,
     likes: 0,
     dislikes: 0,
     description: req.body.description,
@@ -384,7 +351,7 @@ app.post("/api/upload", upload.fields([
     uploader: req.body.uploader
   }).then(data => {
     // Discord webhook
-    sendWebhook(
+    utils.sendWebhook(
       `new video guys <@&1274653503448678440>`,
       "New UPLOAD!!!!",
       [
@@ -397,10 +364,10 @@ app.post("/api/upload", upload.fields([
             "name": req.body.uploader,
             "url": `http://skibidihub.buttplugstudios.xyz/user/${encodeURIComponent(req.body.uploader)}`
           },
-          "url": `http://skibidihub.buttplugstudios.xyz/video/${req.video_id}`,
+          "url": `http://skibidihub.buttplugstudios.xyz/video/${req.skibidihub_id}`,
           "color": 9830655,
           "image": {
-            "url": `https://skibidihub.buttplugstudios.xyz/api/webhookThumbnail/${req.video_id}`
+            "url": `https://skibidihub.buttplugstudios.xyz/api/webhookThumbnail/${req.skibidihub_id}`
           }
         }
       ]

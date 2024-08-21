@@ -1,5 +1,40 @@
 const axios = require("axios");
 const multer = require("multer");
+const fs = require("node:fs");
+const path = require("node:path");
+require("dotenv").config();
+
+const webhookURL = process.env.WEBHOOK_URL;
+
+const fakeTitleList = [
+  "CHICA added BBQ SAUCE to the mcdonalds FOOTJOB!!!",
+  "FREDDY's bubble GYATT bounces on my BBC and breaks it in TWO PIECES!!!",
+  "MONTY gets the PROFESSIONAL hawk tuah GOP GOP!!!",
+  "stepmother FOXY is hungry for COCK!!!",
+  "POV impregnate the CUPCAKE plushie with me!!!",
+  "CHICA cheated on me with the CUPCAKE and i joined IN!!!!",
+  "FREDDYS BBC got stuck in the GARBAGE DISPOSAL!!! You will NOT believe what happened next!",
+  "LEGENDARY pegging session with FUNTIME FOXY!!!",
+  "FUNTIME FOXY gives me the SLOPPY TOPPY with a TWIST!!!",
+  "CHICA does OZEMPIC MUKBANG!!!!",
+  "FOXY LICKS MY TOES ASMR!!!!",
+  "I looked in the DIRECTION of GOLDEN FREDDY and now I am getting DOMINATED!!!"
+]
+
+const fakeCommentList = [
+  "I would LOVE that gyatt on my dingaling dear 🤭",
+  "Those tiddies are blinding dear 😎",
+  "I have a big cock just for you darling 🤗",
+  "I love chica i want to touch her everywhere inappropriately! 🤪",
+  "I would love for funtime foxy to give me head 🥵",
+  "You have the perfect body dear 😏😶‍🌫️",
+  "please suck on my dick  you are so hot i love you 🥵🥵🥵🥵",
+  "Am i not enough for you, freddy? 😥",
+  "Am i not enough for you, chica? 😥",
+  "I would love to clap those bootycheeks of yours 🥵 lets say my tongue is good aswell 👅",
+  "Only if my wife was like you... 😥 i wish...",
+  "you look Beautiful darling, how about you consider contacting me? 🤪🤭"
+]
 
 // Error-handling middleware for multer
 function multerErrorHandler(err, req, res, next) {
@@ -77,4 +112,15 @@ function checkFile(file, filetypes){
   }
 }
 
-module.exports = {multerErrorHandler, getRandomInt, videoExists, checkToken, sendWebhook, nanoid, checkBodyVideo, checkFile};
+function getThumbnail(id) {
+  if (fs.existsSync(path.join("videos", id + "/"))) {
+    return path.join(
+      __dirname,
+      path.join("videos", path.join(id, "thumbnail.jpg"))
+    )
+  } else {
+    return null;
+  }
+}
+
+module.exports = {multerErrorHandler, getRandomInt, videoExists, checkToken, sendWebhook, nanoid, checkBodyVideo, checkFile, getThumbnail, fakeCommentList, fakeTitleList};
