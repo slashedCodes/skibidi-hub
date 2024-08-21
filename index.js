@@ -4,24 +4,26 @@ const path = require("node:path");
 const supabase = require("@supabase/supabase-js");
 const bodyParser = require("body-parser");
 const cookie_parser = require("cookie-parser");
-const axios = require("axios");
 const multer = require("multer");
 const app = express();
 require("dotenv").config();
+
+const utils = require("./utils.js");
 
 const port = 3000;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     try {
-      if(!checkBodyVideo(req.body)) throw new Error("invalid video body");
-      if(!checkToken(req, "/api/upload multer")) throw new Error("unauthorized");
-      if(!videoExists(req.body.id)) {
-        fs.mkdirSync(path.join(__dirname, path.join("videos", req.body.id)))
+      if(!utils.checkBodyVideo(req.body)) throw new Error("invalid video body");
+      if(!utils.checkToken(req, "/api/upload multer")) throw new Error("unauthorized");
+      req.video_id = nanoid(7);
+      if(!utils.videoExists(req.video_id)) {
+        fs.mkdirSync(path.join(__dirname, path.join("videos", req.video_id)))
       }
-      if(file.fieldname == "video" && !checkFile(file, /mp4|webm/)) throw new Error("invalid video type");
-      if(file.fieldname == "thumbnail" && !checkFile(file, /jpg|jpeg|png|gif/)) throw new Error("invalid thumbnail type");
+      if(file.fieldname == "video" && !utils.checkFile(file, /mp4|webm/)) throw new Error("invalid video type");
+      if(file.fieldname == "thumbnail" && !utils.checkFile(file, /jpg|jpeg|png|gif/)) throw new Error("invalid thumbnail type");
       
-      return cb(null, path.join(__dirname, path.join("videos", req.body.id)))
+      return cb(null, path.join(__dirname, path.join("videos", req.video_id)))
     } catch (err) {
       return cb(err)
     }
@@ -33,17 +35,6 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage: storage });
-
-function checkFile(file, filetypes){
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
-
-  if(mimetype && extname){
-    return true;
-  } else {
-    return false;
-  }
-}
 
 const fakeTitleList = [
   "CHICA added BBQ SAUCE to the mcdonalds FOOTJOB!!!",
@@ -116,7 +107,7 @@ app.get("/user/:user", (req, res) => {
 app.get("/api/video/:id", function (req, res) {
   const range = req.headers.range;
 
-  if(!checkToken(req, "/api/video/:id")) {
+  if(!utils.checkToken(req, "/api/video/:id")) {
     return res.sendFile(
       path.join(
         __dirname,
@@ -149,7 +140,7 @@ app.get("/api/video/:id", function (req, res) {
 
 // Get a videos thumbnail according to its video ID.
 app.get("/api/thumbnail/:id", (req, res) => {
-  if (!checkToken(req, "/api/thumbnail/:id")) {
+  if (!utils.checkToken(req, "/api/thumbnail/:id")) {
     let images = fs.readdirSync(
       path.join(__dirname, path.join("www", path.join("assets", "troll")))
     );
@@ -196,9 +187,9 @@ app.get("/api/webhookThumbnail/:id", (req, res) => {
 
 // Get the info for a video according to its video ID.
 app.get("/api/videoInfo/:id", (req, res) => {
-  if(!videoExists(req.params.id)) return res.sendStatus(404);
+  if(!utils.videoExists(req.params.id)) return res.sendStatus(404);
 
-  if(!checkToken(req, "/api/videoInfo/:id")) {
+  if(!utils.checkToken(req, "/api/videoInfo/:id")) {
     let newData = {};
     newData.title = fakeTitleList[getRandomInt(fakeTitleList.length)]
     newData.description = "SIGN IN to see this EPIC content"
@@ -226,9 +217,9 @@ app.get("/api/videoInfo/:id", (req, res) => {
 
 // Get the comments for a video according to its video ID.
 app.get("/api/comments/:videoID", (req, res) => {
-  if(!videoExists(req.params.videoID)) return res.sendStatus(404);
+  if(!utils.videoExists(req.params.videoID)) return res.sendStatus(404);
 
-  if(!checkToken(req, "/api/comments/:videoID")) {
+  if(!utils.checkToken(req, "/api/comments/:videoID")) {
     let comments = [];
     for(let i = 0; i < 8; i++) {
       let comment = {};
@@ -260,7 +251,7 @@ app.get("/api/comments/:videoID", (req, res) => {
 
 // Get a list of all videos
 app.get("/api/getAllVideos", (req, res) => {
-  if(!checkToken(req, "/api/getAllVideos/")) {
+  if(!utils.checkToken(req, "/api/getAllVideos/")) {
     let newData = [];
     for(let i = 0; i < 12; i++) {
       let temp = {};
@@ -290,13 +281,13 @@ app.get("/api/getAllVideos", (req, res) => {
 
 // Send a comment
 app.post("/api/comment", async (req, res) => {
-  if (!checkToken(req, "/api/comment")) return res.sendStatus(401);
+  if (!utils.checkToken(req, "/api/comment")) return res.sendStatus(401);
   
   // Sanity chekcs
   if(!req.body.commenter) return res.sendStatus(400);
   if(!req.body.videoID) return res.sendStatus(400);
   if(!req.body.text) return res.sendStatus(400);
-  if(!videoExists(req.body.videoID)) return res.sendStatus(404);
+  if(!utils.videoExists(req.body.videoID)) return res.sendStatus(404);
 
   client
     .from("comments")
@@ -332,8 +323,8 @@ app.post("/api/comment", async (req, res) => {
 
 // Like a video
 app.post("/api/like/:id", async (req, res) => {
-  if(!checkToken(req, "/api/like/:id")) return res.sendStatus(401);
-  if(!videoExists(req.params.id)) return res.sendStatus(404);
+  if(!utils.checkToken(req, "/api/like/:id")) return res.sendStatus(401);
+  if(!utils.videoExists(req.params.id)) return res.sendStatus(404);
 
   const likesData = await client
     .from("videos")
@@ -352,8 +343,8 @@ app.post("/api/like/:id", async (req, res) => {
 
 // Dislike a video
 app.post("/api/dislike/:id", async (req, res) => {
-  if(!checkToken(req, "/api/dislike/:id")) return res.sendStatus(401);
-  if(!videoExists(req.params.id)) return res.sendStatus(404);
+  if(!utils.checkToken(req, "/api/dislike/:id")) return res.sendStatus(401);
+  if(!utils.videoExists(req.params.id)) return res.sendStatus(404);
 
   const dislikesData = await client
     .from("videos")
@@ -380,13 +371,12 @@ app.get("/api/userVideos/:id", async (req, res) => {
 app.post("/api/upload", upload.fields([
   { name: 'video' }, { name: 'thumbnail' }
 ]), multerErrorHandler, async (req, res) => {
-  console.log("aaa");
-  if(!checkBodyVideo(req.body)) return res.status(400).json({ message: "invalid video body" });
-  if(!checkToken(req, "/api/upload")) return res.status(401).json({ message: "SIGN IN to UPLOAD videos!!!" });
+  console.log(req.skibidihub_id);
+  if(!utils.checkBodyVideo(req.body)) return res.status(400).json({ message: "invalid video body" });
+  if(!utils.checkToken(req, "/api/upload")) return res.status(401).json({ message: "SIGN IN to UPLOAD videos!!!" });
 
   await client.from("videos").insert({
-    id: req.body.id,
-    uploaded_at: new Date().toISOString,
+    id: req.video_id,
     likes: 0,
     dislikes: 0,
     description: req.body.description,
@@ -407,10 +397,10 @@ app.post("/api/upload", upload.fields([
             "name": req.body.uploader,
             "url": `http://skibidihub.buttplugstudios.xyz/user/${encodeURIComponent(req.body.uploader)}`
           },
-          "url": `http://skibidihub.buttplugstudios.xyz/video/${req.body.id}`,
+          "url": `http://skibidihub.buttplugstudios.xyz/video/${req.video_id}`,
           "color": 9830655,
           "image": {
-            "url": `https://skibidihub.buttplugstudios.xyz/api/webhookThumbnail/${req.body.id}`
+            "url": `https://skibidihub.buttplugstudios.xyz/api/webhookThumbnail/${req.video_id}`
           }
         }
       ]
@@ -422,70 +412,3 @@ app.post("/api/upload", upload.fields([
 app.listen(port, () => {
   console.log(`skibidihub listening on port ${port}`);
 });
-
-// Error-handling middleware for multer
-function multerErrorHandler(err, req, res, next) {
-  if (err instanceof multer.MulterError) {
-    return res.status(400).json({ message: `Multer error: ${err.message}` });
-  } else if (err) {
-    return res.status(400).json({ message: `Upload error: ${err.message}` });
-  }
-  next();
-}
-
-
-// Returns a random int up to a set limit.
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function videoExists(id) {
-  // Here, i'd much rather check if its uploaded than exists on the database.
-  if(fs.existsSync(
-    path.join(__dirname, path.join("videos", id))
-  )) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function checkToken(req, func) {
-  const token = req.cookies.token
-  
-  if (token == undefined) return;
-  if (token == null) return;
-  if (token.trim() == "") return;
-  let split = token.split("*&*&*&*&&&&*&&&&*&****&***&*");
-  if (split.length > 1 && split[1] === "nexacopicloves15yearoldchineseboys") {
-    console.log(`${func} being triggered by: ${split[0]}`);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-async function sendWebhook(message, username, embeds) {
-  await axios.post(webhookURL, {
-    "username": username,
-    "content": message,
-    "embeds": embeds
-  })
-}
-
-const nanoid = (length) => {
-  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  let id = '';
-  for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      id += characters[randomIndex];
-  }
-  return id;
-}
-
-function checkBodyVideo(body) {
-  if(body.title.trim() == "") return false;
-  if(body.uploader.trim() == "") return false;
-  if(body.id.trim() == "") return false;
-  return true;
-}
