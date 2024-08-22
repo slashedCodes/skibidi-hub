@@ -43,6 +43,20 @@ body {
     height: 0px !important;
     width: 30px;
   }
+
+  .video-video {
+    padding: 0px;
+    width: 100vw !important;
+  }
+
+  .video-container {
+    margin: 0 !important;
+    padding: 0px !important;
+  }
+
+  .comment-textarea {
+    width: 80vw;
+  }
 }
 
 
@@ -161,7 +175,6 @@ body {
 .user-info {
   padding: 20px;
   background: orange;
-  width: 100vw;
   display: flex;
   flex-direction: row;
   gap: 10px;
