@@ -63,7 +63,6 @@ const ipBlacklist = JSON.parse(fs.readFileSync("./ipbans.json"));
 app.use(function(req, res, next) {
   req.ipInfo = ipware.getClientIP(req);
 
-  console.log(req.ipInfo.ip);
   if(ipBlacklist.includes(req.ipInfo.ip)) {
     return res.sendFile(path.join(__dirname, path.join("www", "down.html")));
   }
