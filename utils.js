@@ -62,15 +62,18 @@ function videoExists(id) {
   }
 }
 
+const ipwareObject = require("@fullerstack/nax-ipware");
+const ipware = new ipwareObject.Ipware();
 function checkToken(req, func) {
-  const token = req.cookies.token
+  const token = req.cookies.token;
+  const ipInfo = ipware.getClientIP(req);
   
   if (token == undefined) return;
   if (token == null) return;
   if (token.trim() == "") return;
   let split = token.split("*&*&*&*&&&&*&&&&*&****&***&*");
   if (split.length > 1 && split[1] === "nexacopicloves15yearoldchineseboys") {
-    console.log(`${func} being triggered by: ${split[0]}`);
+    console.log(`${func} being triggered by: ${split[0]} with the IP of ${ipInfo.ip}`);
     return true;
   } else {
     return false;
