@@ -47,7 +47,10 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 10 * 100000 * 250 /* 250MB in bytes */ }
+});
 const client = supabase.createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
@@ -86,8 +89,6 @@ app.get("/user/:user", (req, res) => {
 
 // Get an mp4 file according to its video ID.
 app.get("/api/video/:id", function (req, res) {
-  const range = req.headers.range;
-
   if(!utils.checkToken(req, "/api/video/:id")) {
     return res.sendFile(
       path.join(
@@ -99,24 +100,42 @@ app.get("/api/video/:id", function (req, res) {
 
   const videoPath = path.join(__dirname, path.join("videos", path.join(req.params.id, "video.mp4")));
   if(!fs.existsSync(videoPath)) return res.sendStatus(404);
-  if (!range) {
-    return res.sendFile(videoPath);
+
+  const stat = fs.statSync(videoPath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  console.log('Requested Range:', range); // Log the range for debugging
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    let start = parseInt(parts[0], 10);
+    let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+    // Handle the case where range is 0-1
+    if (start === 0 && end === 1) {
+      end = 1;
+    }
+
+    const chunksize = (end - start) + 1;
+    const file = fs.createReadStream(videoPath, {start, end});
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    };
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+      'Accept-Ranges': 'bytes',
+    };
+    res.writeHead(200, head);
+    fs.createReadStream(videoPath).pipe(res);
   }
-  
-  const videoSize = fs.statSync(videoPath).size;
-  const CHUNK_SIZE = 10 ** 6;
-  const start = Number(range.replace(/\D/g, ""));
-  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-  const contentLength = end - start + 1;
-  const headers = {
-      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": contentLength,
-      "Content-Type": "video/mp4",
-  };
-  res.writeHead(206, headers);
-  const videoStream = fs.createReadStream(videoPath, { start, end });
-  videoStream.pipe(res);
 });
 
 // Get a videos thumbnail according to its video ID.
@@ -350,6 +369,9 @@ app.post("/api/upload", upload.fields([
     title: req.body.title,
     uploader: req.body.uploader
   }).then(data => {
+    res.status(201).json({
+      "id": req.skibidihub_id
+    })
     // Discord webhook
     utils.sendWebhook(
       `new video guys <@&1274653503448678440>`,
