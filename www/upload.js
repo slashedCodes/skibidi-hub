@@ -35,7 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("progress").innerText = `${percent}%`
             },
         }).then(data => {
-            console.log(data);
+            if(data.status == 201) {
+                alert("Upload successfull!");
+                window.location.pathname = `/video/${data.data.id}`
+            }
         }).catch(error => {
             console.log(error)
             if(error.response) {

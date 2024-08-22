@@ -47,7 +47,10 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 10 * 100000 * 250 /* 250MB in bytes */ }
+});
 const client = supabase.createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
@@ -350,6 +353,9 @@ app.post("/api/upload", upload.fields([
     title: req.body.title,
     uploader: req.body.uploader
   }).then(data => {
+    res.status(201).json({
+      "id": req.skibidihub_id
+    })
     // Discord webhook
     utils.sendWebhook(
       `new video guys <@&1274653503448678440>`,
