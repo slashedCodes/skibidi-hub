@@ -51,10 +51,25 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 100000 * 250 /* 250MB in bytes */ }
 });
+
 const client = supabase.createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
+
+const ipwareObject = require("@fullerstack/nax-ipware");
+const ipware = new ipwareObject.Ipware();
+const ipBlacklist = JSON.parse(fs.readFileSync("./ipbans.json"));
+app.use(function(req, res, next) {
+  req.ipInfo = ipware.getClientIP(req);
+
+  console.log(req.ipInfo.ip);
+  if(ipBlacklist.includes(req.ipInfo.ip)) {
+    return res.sendFile(path.join(__dirname, path.join("www", "down.html")));
+  }
+
+  next();
+});
 
 app.use(express.static("www")); // Static folder
 app.use(bodyParser.json());
@@ -78,6 +93,7 @@ app.get("/contact", (req, res) => {
 })
 
 app.get("/video/:id", (req, res) => {
+  if(!utils.videoExists(req.params.id)) return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
   res.sendFile(path.join(__dirname, path.join("www", "video.html")));
 });
 
