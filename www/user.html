@@ -18,31 +18,62 @@
   <body>
     <div class="navbar">
       <div class="navbar-spacer"></div>
-      <a href="/"><img class="navbar-img" src="../assets/logo.png" /></a>
+      <a href="/" class="navbar-img-anchor"><img class="navbar-img" src="../assets/logo.png" /></a>
       <div class="navbar-spacer"></div>
-      <h1>The site for all of your skibidi fnaf XXX needs!</h1>
-      <div class="navbar-spacer"></div>
-      <a class="anchor" href="/login">
-        <button class="login" id="login-button">Login</button>
-      </a>
-
-      <a href="/upload" class="anchor">
-        <button id="upload-button" class="login disabled">Upload</button>
-      </a>
-      
-      <a class="anchor" id="account-button-anchor">
-        <button id="account-button" class="login disabled">My Account</button>
-      </a>
-      <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+      <div class="searchbar-container">
+        <form id="searchbar-form" action="/search">
+          <input type="text" name="query" class="searchbar">
+        </form>
+      </div>
+      <div class="navbar-buttons">
+        <a class="anchor" href="/login">
+          <button class="login" id="login-button">Login</button>
+        </a>
+  
+        <a href="/upload" class="anchor">
+          <button id="upload-button" class="login disabled">Upload</button>
+        </a>
+        
+        <a class="anchor" id="account-button-anchor">
+          <button id="account-button" class="login disabled">My Account</button>
+        </a>
+        <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+        <div class="navbar-spacer"></div>
+      </div>
     </div>
 
     <div class="user-info">
+      <div class="user-info-extra">
+        <h2 id="subscribers">LOADING</h2>
+        <h3 id="social-score">LOADING</h3>
+        <p id="description" class="description">LOADING</p>
+      </div>
+
       <img src="./../assets/user.png" class="user-pfp" />
       <h1>
         Videos published by: <br />
-        <p id="user-info-name" class="user-info-name"></p>
+        <div class="span">
+          <p id="user-info-name" class="user-info-name"></p>
+          <img src="/assets/verified.png" width="30" id="verified" class="disabled">        
+          <a href="caca" id="website-anchor">
+            <img src="/assets/website.png" width="50">
+          </a>
+          <button class="subscribe" id="subscribe">
+            Subscribe
+          </button>
+          <a href="/editProfile">
+            <button class="edit-profile disabled" id="edit-profile">edit profile</button>
+          </a>
+        </div>
       </h1>
     </div>
+
+    <dialog id="description-dialog" class="description-dialog">
+      <button onclick="document.getElementById('description-dialog').close()" class="close">X</button>
+      <br />
+
+      <p id="description-dialog-text"></p>
+    </dialog>
 
     <h1 id="loading" class="no-videos">
       LOADING,,,,, <br />

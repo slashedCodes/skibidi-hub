@@ -55,7 +55,7 @@ function gotoUser(user) {
   window.location.pathname = `/user/${user}`;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   let video = document.getElementById("video");
   let id = window.location.pathname.split("/")[2];
 
@@ -108,32 +108,42 @@ document.addEventListener("DOMContentLoaded", () => {
   video.setAttribute("poster", `/api/thumbnail/${id}`);
 
   // Load video info
-  getInfo(id).then((info) => {
-    document.getElementById("video-title").innerText = info.title;
-    document.getElementById(
-      "video-author"
-    ).innerText = `Uploaded by: ${info.uploader}`;
-    document.getElementById("video-author-anchor").href = `/user/${encodeURIComponent(info.uploader)}`;
-    document.getElementById("video-date").innerText =
-      parseTimestamp(info.uploaded_at).date +
-      " " +
-      parseTimestamp(info.uploaded_at).timestamp;
-    document.getElementById("video-description").innerText = info.description;
-    document.getElementById("video-likes").innerText = info.likes;
-    document.getElementById("video-dislikes").innerText = info.dislikes;
-  });
+  const info = await getInfo(id);
+  document.getElementById("video-title").innerText = info.title;
+  document.getElementById(
+    "video-author"
+  ).innerText = `Uploaded by: ${info.uploader}`;
+  document.getElementById("video-author-anchor").href = `/user/${encodeURIComponent(info.uploader)}`;
+  document.getElementById("video-date").innerText =
+    parseTimestamp(info.uploaded_at).date +
+    " " +
+    parseTimestamp(info.uploaded_at).timestamp;
+  document.getElementById("video-description").innerText = info.description;
+  document.getElementById("video-likes").innerText = info.likes;
+  document.getElementById("video-dislikes").innerText = info.dislikes;
+
+  // Load author info
+  const authorInfo = await getUserInfo(info.uploader);
+  if(authorInfo.verified) document.getElementById("verified").classList.remove('disabled')
+  document.getElementById("author-info").innerText = `${authorInfo.subscribers} subscribers ඞ ${authorInfo.social_score} social credit score`;
+
+  // Check if the user is already subscribed
+  if(!localStorage.getItem("subscribed")) localStorage.setItem("subscribed", JSON.stringify([]))
+  // If so, disable the subscribe button
+  if(JSON.parse(localStorage.getItem("subscribed")).includes(authorInfo.name)) document.getElementById("subscribe").setAttribute("disabled", "true");
+
+  document.getElementById("subscribe").onclick = function(event) { subscribe(authorInfo) }
 
   // Load comments
-  getComments(id).then((comments) => {
-    comments.forEach((comment) => {
-      makeComment(
-        comment.commenter,
-        parseTimestamp(comment.created_at).date +
-          " " +
-          parseTimestamp(comment.created_at).timestamp,
-        comment.text
-      );
-    });
+  const comments = await getComments(id);
+  comments.forEach((comment) => {
+    makeComment(
+      comment.commenter,
+      parseTimestamp(comment.created_at).date +
+        " " +
+        parseTimestamp(comment.created_at).timestamp,
+      comment.text
+    );
   });
 
   document.getElementById("loading").classList.add("disabled")
@@ -169,4 +179,29 @@ function makeComment(username, timestamp, content) {
 
 function home() {
   window.location.pathname = "/";
+}
+
+// TODO: for now subscribe function is fine but maybe polish it up a little
+function subscribe(authorInfo) {
+  return axios.get(`/api/subscribe/${encodeURIComponent(authorInfo.name)}`).then(data => {
+    if(data.status != 200) {
+      return document.getElementById("author-info").innerText = "ERROR ERROR ERROE SEREVER ERROR!!!!"
+    }
+
+    // Write to localStorage
+    if(!localStorage.getItem("subscribed")) localStorage.setItem("subscribed", JSON.stringify([]))
+    const subscribed = JSON.parse(localStorage.getItem("subscribed"));
+    subscribed.push(authorInfo.name);
+
+    localStorage.setItem("subscribed", JSON.stringify(subscribed))
+
+    // Disable subscribed button
+    document.getElementById("subscribe").setAttribute("disabled", "true");
+
+    // Update subscribed counter
+    document.getElementById("author-info").innerText = `${authorInfo.subscribers + 1} subscribers ඞ ${authorInfo.social_score} social credit score`;
+  }).catch(error => {
+    console.error(error);
+    return document.getElementById("author-info").innerText = "ERROR ERROR ERROE SEREVER ERROR!!!!"
+  })
 }

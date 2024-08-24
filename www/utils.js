@@ -6,6 +6,14 @@ async function getAllUserVideos(userID) {
   })
 }
 
+async function getUserInfo(name) {
+  return axios.get(`/api/userInfo/${encodeURIComponent(name)}`).then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`getUserInfo() error: ${error}`);
+  })
+}
+
 async function getInfo(id) {
   return await axios.get(`/api/videoInfo/${id}`, {
     responseType: "json",

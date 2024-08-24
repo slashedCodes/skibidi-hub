@@ -26,7 +26,7 @@ body {
   background-color: #2b2b2b;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 750px) {
   .navbar {
     width: 100vw;
     height: fit-content;
@@ -57,8 +57,14 @@ body {
   .comment-textarea {
     width: 80vw;
   }
-}
 
+  .navbar-buttons {
+    position: inherit !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+  }
+}
 
 .navbar-spacer {
   height: 50px;
@@ -67,6 +73,10 @@ body {
 
 .navbar-img {
   height: 50px;
+}
+
+.navbar-img-anchor {
+  z-index: 2;
 }
 
 .navbar-img:hover {
@@ -263,6 +273,7 @@ body {
 }
 
 .anchor {
+  color: white;
   text-decoration: none;
 }
 
@@ -284,4 +295,150 @@ body {
   color: white;
   cursor: pointer;
   text-decoration: overline;
+}
+
+.john-pork-container {
+  z-index: 10000 !important;
+  position:absolute;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+
+.john-pork {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+}
+
+.john-pork-image {
+  user-select: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+.john-pork-map {
+  width: 100vw;
+  height: 100vh;
+}
+
+.decline {
+  cursor: pointer;
+  border-radius: 100%;
+  position: absolute;
+  top: 72%;
+  left: 14.1%;
+  width: 30.2%;
+  height: 17%;
+}
+
+.accept {
+  cursor: pointer;
+  border-radius: 100%;
+  position: absolute;
+  top: 72.5%;
+  left: 63%;
+  width: 29.4%;
+  height: 16.5%;
+}
+
+.john-pork-call {
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+
+.span {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+}
+
+.subscribe {
+  border-radius: 100%;
+  border: solid brown 2px;
+  font-size: 18px;
+}
+
+.description-dialog {
+  border: 2px solid orange;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: black;
+  color: orange;
+}
+
+.close {
+  border-radius: 5px;
+  padding: 5px;
+  background-color: orange;
+  color: black;
+  font-family: cursive;
+}
+
+.close:hover {
+  cursor: pointer;
+  background-color: purple;
+}
+
+.description-click {
+  text-decoration: underline;
+}
+
+.description-click:hover {
+  color: grey;
+  cursor: pointer;
+}
+
+.edit-profile {
+  border: 2px black solid;
+  border-radius: 50px;
+  color: orange;
+  font-family: cursive;
+  font-size: 15px;
+  background-color: purple;
+}
+
+.edit-profile:hover {
+  cursor: pointer;
+}
+
+.navbar-buttons {
+  position: absolute;
+  width: 100vw;
+  
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.searchbar-container {
+  z-index: 2;
+}
+
+.searchbar {
+  background-color: black;
+  color: orange;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 24px;
+
+  border: none;
+  border-radius: 30px;
+  padding: 10px;
+}
+
+.search-videos {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.search-video {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
 }

@@ -2,9 +2,14 @@ const axios = require("axios");
 const multer = require("multer");
 const fs = require("node:fs");
 const path = require("node:path");
+const supabase = require("@supabase/supabase-js");
 require("dotenv").config();
 
 const webhookURL = process.env.WEBHOOK_URL;
+const client = supabase.createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 const fakeTitleList = [
   "CHICA added BBQ SAUCE to the mcdonalds FOOTJOB!!!",
@@ -76,9 +81,28 @@ function checkToken(req, func) {
     console.log(`${func} being triggered by: ${split[0]} with the IP of ${ipInfo.ip}`);
     return true;
   } else {
+    console.log(`${func} is being triggered by ${ipInfo.ip}`);
     return false;
   }
 }
+
+function checkUserToken(req, func) {
+  const token = req.cookies.token;
+  const ipInfo = ipware.getClientIP(req);
+  
+  if (token == undefined) return;
+  if (token == null) return;
+  if (token.trim() == "") return;
+  let split = token.split("*&*&*&*&&&&*&&&&*&****&***&*");
+  if (split.length > 1 && split[1] === "nexacopicloves15yearoldchineseboys") {
+    console.log(`${func} being triggered by: ${split[0]} with the IP of ${ipInfo.ip}`);
+    return {user: split[0], value: true};
+  } else {
+    console.log(`${func} is being triggered by ${ipInfo.ip}`);
+    return {user: null, value: false};
+  }
+}
+
 
 async function sendWebhook(message, username, embeds) {
   await axios.post(webhookURL, {
@@ -126,4 +150,30 @@ function getThumbnail(id) {
   }
 }
 
-module.exports = {multerErrorHandler, getRandomInt, videoExists, checkToken, sendWebhook, nanoid, checkBodyVideo, checkFile, getThumbnail, fakeCommentList, fakeTitleList};
+async function userExists(id) {
+  return await client.from("users").select().eq("name", id).then(data => {
+    if(data.error) {
+      return false;
+    } else if(data.status != 200) {
+      return false;
+    }
+
+    if(!data.data[0]) return false;
+    return true;
+  })
+}
+
+// Thank you stackoverflow
+function isValidUrl(string) {
+  let url;
+  
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;  
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+module.exports = {isValidUrl, multerErrorHandler, getRandomInt, videoExists, checkToken, sendWebhook, nanoid, checkBodyVideo, checkFile, getThumbnail, userExists, checkUserToken, fakeCommentList, fakeTitleList};

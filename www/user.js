@@ -6,6 +6,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     "no-videos"
   ).innerText = `There seems to be no videos published by user of the site "skibidihub" by the name of "${id}".`;
 
+  const user = await getUserInfo(id)
+  if(user.verified) document.getElementById("verified").classList.remove('disabled');
+  if(Cookies.get("user") === id) document.getElementById("edit-profile").classList.remove("disabled")
+
+  if(user.website) {
+    document.getElementById("website-anchor").href = user.website;
+  } else {
+    document.getElementById("website-anchor").remove();
+  }
+  document.getElementById("subscribers").innerText = `${user.subscribers} subscribers`;
+  document.getElementById("social-score").innerText = `${user.social_score} social credit score`
+  if(user.description) {
+    if(user.description.length > 18) {
+      document.getElementById("description").innerText = (user.description.slice(0, -(user.description.length - 15)) + "...").replace(/(\r\n|\n|\r)/gm, " ");
+      document.getElementById("description").classList.add("description-click");
+      document.getElementById("description").addEventListener("click", () => {
+        document.getElementById("description-dialog-text").innerText = user.description;
+        document.getElementById("description-dialog").showModal()
+      })
+    } else {
+      document.getElementById("description").innerText = user.description.replace(/(\r\n|\n|\r)/gm, " ")
+    } 
+  } else {
+    document.getElementById("description").innerText = "no description set"
+  }
+  
+  // Check if the user is already subscribed
+  if(!localStorage.getItem("subscribed")) localStorage.setItem("subscribed", JSON.stringify([]))
+  // If so, disable the subscribe button
+  if(JSON.parse(localStorage.getItem("subscribed")).includes(user.name)) document.getElementById("subscribe").setAttribute("disabled", "true");
+
+  document.getElementById("subscribe").onclick = function(event) { subscribe(user) }
+
   if (Cookies.get("user") != null) {
     document.getElementById("user-info-name").innerText = id;
     document.getElementById("login-button").classList.add("disabled");
@@ -62,4 +95,29 @@ async function makeVideo(id, info) {
   videoInfoContainer.appendChild(videoUploader);
 
   document.getElementById("videos").appendChild(video);
+}
+
+// TODO: for now subscribe function is fine but maybe polish it up a little
+function subscribe(authorInfo) {
+  return axios.get(`/api/subscribe/${encodeURIComponent(authorInfo.name)}`).then(data => {
+    if(data.status != 200) {
+      return document.getElementById("subscribers").innerText = "ERROR ERROR ERROE SEREVER ERROR!!!!"
+    }
+
+    // Write to localStorage
+    if(!localStorage.getItem("subscribed")) localStorage.setItem("subscribed", JSON.stringify([]))
+    const subscribed = JSON.parse(localStorage.getItem("subscribed"));
+    subscribed.push(authorInfo.name);
+
+    localStorage.setItem("subscribed", JSON.stringify(subscribed))
+
+    // Disable subscribed button
+    document.getElementById("subscribe").setAttribute("disabled", "true");
+
+    // Update subscribed counter
+    document.getElementById("subscribers").innerText = `${authorInfo.subscribers + 1} subscribers`;
+  }).catch(error => {
+    console.error(error);
+    return document.getElementById("subscribers").innerText = "ERROR ERROR ERROE SEREVER ERROR!!!!"
+  })
 }

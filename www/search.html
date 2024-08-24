@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>SkibidiHub - Search</title>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-spacer"></div>
+        <a href="/" class="navbar-img-anchor"><img class="navbar-img" src="../assets/logo.png" /></a>
+        <div class="navbar-spacer"></div>
+        <div class="searchbar-container">
+            <form id="searchbar-form" action="/search">
+              <input type="text" name="query" class="searchbar">
+            </form>
+          </div>
+        <div class="navbar-buttons">
+          <a class="anchor" href="/login">
+            <button class="login" id="login-button">Login</button>
+          </a>
+    
+          <a href="/upload" class="anchor">
+            <button id="upload-button" class="login disabled">Upload</button>
+          </a>
+          
+          <a class="anchor" id="account-button-anchor">
+            <button id="account-button" class="login disabled">My Account</button>
+          </a>
+          <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+          <div class="navbar-spacer"></div>
+        </div>
+    </div>
+    
+    <div class="search-videos" id="videos"></div>
+
+    <h1 class="no-videos" id="no-results">LOADNING.</h1>
+
+    <script src="search.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
+</body>
+</html>

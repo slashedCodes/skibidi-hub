@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.pathname = `/video/${data.data.id}`
             }
         }).catch(error => {
-            console.log(error)
             if(error.response) {
                 alert(error.response.data.message)
             }

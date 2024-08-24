@@ -49,7 +49,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 10 * 100000 * 250 /* 250MB in bytes */ }
+  limits: { fileSize: 1000000 * 250 /* 250MB in bytes */ }
 });
 
 const client = supabase.createClient(
@@ -64,6 +64,7 @@ app.use(function(req, res, next) {
   req.ipInfo = ipware.getClientIP(req);
 
   if(ipBlacklist.includes(req.ipInfo.ip)) {
+    res.setHeader("Cache-Control", "no-cache");
     return res.sendFile(path.join(__dirname, path.join("www", "down.html")));
   }
 
@@ -91,13 +92,31 @@ app.get("/contact", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "contact.html")));
 })
 
+app.get("/editProfile", (req, res) => {
+  res.sendFile(path.join(__dirname, path.join("www", "editProfile.html")));
+});
+
+app.get("/search", (req, res) => {
+  res.sendFile(path.join(__dirname, path.join("www", "search.html")));
+});
+
 app.get("/video/:id", (req, res) => {
   if(!utils.videoExists(req.params.id)) return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
   res.sendFile(path.join(__dirname, path.join("www", "video.html")));
 });
 
 app.get("/user/:user", (req, res) => {
-  res.sendFile(path.join(__dirname, path.join("www", "user.html")));
+  // Check if user exists
+  client.from("users").select().eq("name", decodeURIComponent(req.params.user)).then(data => {
+    if(data.error) {
+      return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
+    } else if (data.status != 200) {
+      return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
+    }
+
+    if(!data.data[0]) return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
+    res.sendFile(path.join(__dirname, path.join("www", "user.html")));
+  })
 });
 
 // API //
@@ -207,13 +226,100 @@ app.get("/api/videoInfo/:id", (req, res) => {
     .eq("id", req.params.id)
     .then((data) => {
       if (data.error) {
-        res.sendStatus(400);
+        return res.sendStatus(400);
       } else if (data.status != 200) {
-        res.sendStatus(data.status);
+        return res.sendStatus(data.status);
       }
 
-      res.send(data["data"][0]);
+      return res.send(data.data[0]);
     });
+});
+
+// Pulls the user information from the database and returns it.
+app.get("/api/userInfo/:id", (req, res) => {
+  client.from("users").select().eq("name", decodeURIComponent(req.params.id)).then(data => {
+    if(data.error) {
+      return res.sendStatus(400);
+    } else if (data.status != 200) {
+      return res.sendStatus(data.status);
+    }
+
+    if(!data.data[0]) return res.sendStatus(400);
+    return res.send(data.data[0]);
+  })
+})
+
+// Subscribes to a user
+app.get("/api/subscribe/:id", async (req, res) => {
+  if(!utils.checkToken(req)) return res.sendStatus(401);
+  if(!utils.userExists(decodeURIComponent(req.params.id))) return res.sendStatus(400);
+
+  const subscribersData = await client
+    .from("users")
+    .select("subscribers")
+    .eq("name", decodeURIComponent(req.params.id));
+
+  const subscribers = subscribersData["data"][0]["subscribers"] + 1;
+
+  client.from("users").update({
+    subscribers: subscribers
+  }).eq("name", decodeURIComponent(req.params.id)).then(data => {
+    if(data.error) {
+      return res.sendStatus(400);
+    } else if (data.status != 204) {
+      return res.sendStatus(data.status);
+    }
+
+    return res.sendStatus(200);
+  })
+});
+
+// Login endpoints (Just handles user creation)
+app.post("/api/login", async (req, res) => {
+  if(!req.body.user) return res.sendStatus(400);
+  const ipInfo = ipware.getClientIP(req);
+
+  // If user doesn't exist, create the user.
+  if(!await utils.userExists(req.body.user)) {
+    console.log(`User ${req.body.user} doesn't exist. Creating the user...`);
+    await client.from("users").insert({
+      name: req.body.user
+    }).then(data => {
+      if(data.error) {
+        return res.status(500).send(data);
+      } else if(data.status != 201) {
+        return res.status(500).send(data);
+      }
+
+      console.log(`User created successfully. IP: ${ipInfo.ip}`);
+      return res.sendStatus(200);
+    });
+  } else {
+    console.log(`User ${req.body.user} already exists. Logging in... IP: ${ipInfo.ip}`);
+    return res.sendStatus(200);
+  }
+});
+
+app.post("/api/editUser", async (req, res) => {
+  // Validate request
+  const user = utils.checkUserToken(req, "/api/editUser");
+  if(!user.value) return res.status(401).json({message: "you need to login to edit your user page"});
+  if(!req.body.description && !req.body.website) return res.status(400).json({message: "invalid form data"});
+  if(req.body.website && !utils.isValidUrl(req.body.website)) return res.status(400).json({message: "invalid website"});
+  
+  // Update user
+  await client.from("users").update({
+    description: req.body.description,
+    website: req.body.website,
+  }).eq("name", user.user).then(data => {
+    if(data.error) {
+      return res.status(500).send(data);
+    } else if(data.status != 204) {
+      return res.status(500).send(data);
+    }
+
+    return res.sendStatus(200);
+  })
 });
 
 // Get the comments for a video according to its video ID.
@@ -245,7 +351,7 @@ app.get("/api/comments/:videoID", (req, res) => {
       } else if (data.status != 200) {
         res.sendStatus(data.status);
       }
-
+      
       res.send(data["data"]);
     });
 });
@@ -271,14 +377,37 @@ app.get("/api/getAllVideos", (req, res) => {
     .select()
     .then((data) => {
       if (data.error) {
-        res.sendStatus(400);
+        return res.sendStatus(400);
       } else if (data.status != 200) {
-        res.sendStatus(data.status);
+        return res.sendStatus(data.status);
       }
 
-      res.send(data["data"]);
+      return res.send(data["data"]);
     });
 });
+
+// Search endpoint
+app.post("/api/search", (req, res) => {
+  if(!utils.checkToken(req)) return res.sendStatus(401);
+  if(!req.body.query) return res.sendStatus(400);
+  client
+  .from("videos")
+  .select()
+  .then((response) => {
+    if (response.error) {
+      return res.sendStatus(400);
+    } else if (response.status != 200) {
+      return res.sendStatus(response.status);
+    }
+
+    let results = [];
+    response.data.forEach(video => {
+      if(video.title.startsWith(req.body.query) || video.uploader.startsWith(req.body.query)) results.push(video);
+    })
+
+    return res.send(results);
+  });
+})
 
 // Send a comment
 app.post("/api/comment", async (req, res) => {

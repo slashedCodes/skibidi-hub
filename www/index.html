@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <link rel="manifest" href="manifest.json" />
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
 
     <meta content="Home - Skibidihub" property="og:title" />
     <meta content="Skibidihub is the perfect site for all of your skibidi fnaf XXX needs! skibiihub will satisfy your needs! " property="og:description" />
@@ -17,24 +16,43 @@
     <title>SkibidiHub - Home</title>
   </head>
   <body>
+    <div class="john-pork-container disabled" id="john-pork-container">
+      <div class="john-pork disabled" id="john-pork">
+        <img src="/assets/johnpork.jpg" draggable="false" class="john-pork-image" />
+        <div class="decline" id="john-pork-decline"></div>
+        <div class="accept" id="john-pork-accept"></div>
+      </div>
+
+      <img src="/assets/johnpork-in-call.jpg" draggable="false" class="john-pork-call disabled" id="john-pork-call">
+
+      <audio src="/assets/ringtone.mp3" id="john-pork-ringtone" loop></audio>
+      <audio src="/assets/calldisconnect.mp3" id="john-pork-accept"></audio>
+    </div>
+
     <div class="navbar">
       <div class="navbar-spacer"></div>
-      <a href="/"><img class="navbar-img" src="../assets/logo.png" /></a>
+      <a href="/" class="navbar-img-anchor"><img class="navbar-img" src="../assets/logo.png" /></a>
       <div class="navbar-spacer"></div>
-      <h1>The site for all of your skibidi fnaf XXX needs!</h1>
-      <div class="navbar-spacer"></div>
-      <a class="anchor" href="/login">
-        <button class="login" id="login-button">Login</button>
-      </a>
-
-      <a href="/upload" class="anchor">
-        <button id="upload-button" class="login disabled">Upload</button>
-      </a>
-      
-      <a class="anchor" id="account-button-anchor">
-        <button id="account-button" class="login disabled">My Account</button>
-      </a>
-      <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+      <div class="searchbar-container">
+        <form id="searchbar-form" action="/search">
+          <input type="text" name="query" class="searchbar">
+        </form>
+      </div>
+      <div class="navbar-buttons">
+        <a class="anchor" href="/login">
+          <button class="login" id="login-button">Login</button>
+        </a>
+  
+        <a href="/upload" class="anchor">
+          <button id="upload-button" class="login disabled">Upload</button>
+        </a>
+        
+        <a class="anchor" id="account-button-anchor">
+          <button id="account-button" class="login disabled">My Account</button>
+        </a>
+        <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+        <div class="navbar-spacer"></div>
+      </div>
     </div>
 
     <h1>Recomended videos:</h1>
@@ -56,5 +74,6 @@
     <script src="index.js"></script>
     <script src="utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
   </body>
 </html>
