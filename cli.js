@@ -19,7 +19,7 @@ async function main() {
     let ips;
     switch(args[0]) {
         case "help":
-            console.log("Valid commands are:\n\ndelete [id]\nban [ip]\nunban [ip]\ncleanDatabase\ncleanDrive\nupdateSocialScore [user] [-300]\nverifyUser [user]\ndeVerifyUser [user]");
+            console.log("Valid commands are:\n\ndeleteVideo [id]\nban [ip]\nunban [ip]\ncleanDatabase\ncleanDrive\nupdateSocialScore [user] [-300]\nverifyUser [user]\ndeVerifyUser [user]");
             break;
         case "ban":
             if(!args[1]) return console.log("you need to provide an ip address to ban!");
@@ -36,7 +36,7 @@ async function main() {
             fs.writeFileSync("./ipbans.json", JSON.stringify(ips), {encoding:'utf8', flag:'w'})
             console.log("To apply changes, restart the skibidihub server.");
             break;
-        case "delete":
+        case "deleteVideo":
             if(!args[1]) return console.log("you need to provide a video id to delete!");
             if(!utils.videoExists(args[1])) return console.log("the video you are trying to delete doesnt exist!");
             
