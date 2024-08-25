@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const id = decodeURIComponent(window.location.pathname.split("/")[2]);
-  document.getElementById("account-button-anchor").href = `/user/${Cookies.get('user')}`
+  document.getElementById("account-button-anchor").href = `/user/${encodeURIComponent(Cookies.get('user'))}`
 
   document.getElementById(
     "no-videos"
