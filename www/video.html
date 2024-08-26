@@ -17,25 +17,30 @@
   <body>
     <div class="navbar">
       <div class="navbar-spacer"></div>
-      <a href="/"><img class="navbar-img" src="../assets/logo.png" /></a>
+      <a href="/" class="navbar-img-anchor"><img class="navbar-img" src="../assets/logo.png" /></a>
       <div class="navbar-spacer"></div>
-      <h1>The site for all of your skibidi fnaf XXX needs!</h1>
-      <div class="navbar-spacer"></div>
-
-      <a class="anchor" href="/login">
-        <button class="login" id="login-button">Login</button>
-      </a>
-
-      <a href="/upload" class="anchor">
-        <button id="upload-button" class="login disabled">Upload</button>
-      </a>
-      
-      <a class="anchor" id="account-button-anchor">
-        <button id="account-button" class="login disabled">My Account</button>
-      </a>
-
-      <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+      <div class="searchbar-container">
+        <form id="searchbar-form" action="/search">
+          <input type="text" name="query" class="searchbar" placeholder="search">
+        </form>
+      </div>
+      <div class="navbar-buttons">
+        <a class="anchor" href="/login">
+          <button class="login" id="login-button">Login</button>
+        </a>
+  
+        <a href="/upload" class="anchor">
+          <button id="upload-button" class="login disabled">Upload</button>
+        </a>
+        
+        <a class="anchor" id="account-button-anchor">
+          <button id="account-button" class="login disabled">My Account</button>
+        </a>
+        <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
+        <div class="navbar-spacer"></div>
+      </div>
     </div>
+
     <div class="video-container">
 
       <video id="video" class="video-video" controls></video>
@@ -46,7 +51,10 @@
     <div class="video-info">
       <h1 id="video-title">LOADING</h1>
       <div class="video-actions">
-        <a id="video-author-anchor" class="video-author"><h2 id="video-author" class="video-author">LOADING</h2></a>
+        <div class="span">
+          <a id="video-author-anchor" class="video-author"><h2 id="video-author" class="video-author">LOADING</h2></a>
+          <img src="/assets/verified.png" width="30" id="verified" class="disabled">       
+        </div>
         <div class="navbar-spacer"></div>
         <button
           class="like"
@@ -62,10 +70,15 @@
           <img src="../assets/dislike.jpg" width="50" />
           <p id="video-dislikes">LOADING</p>
         </button>
+        <button class="subscribe" id="subscribe">
+          Subscribe
+        </button>
       </div>
     </div>
 
+
     <div class="video-description">
+      <h3 id="author-info"></h3>
       <h2 id="video-date">LOADING</h2>
 
       <p id="video-description">LOADING</p>

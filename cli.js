@@ -19,13 +19,14 @@ async function main() {
     let ips;
     switch(args[0]) {
         case "help":
-            console.log("Valid commands are:\n\ndelete [id]");
+            console.log("Valid commands are:\n\ndeleteVideo [id]\nban [ip]\nunban [ip]\ncleanDatabase\ncleanDrive\nupdateSocialScore [user] [-300]\nverifyUser [user]\ndeVerifyUser [user]");
             break;
         case "ban":
             if(!args[1]) return console.log("you need to provide an ip address to ban!");
             ips = JSON.parse(fs.readFileSync("./ipbans.json"));
             ips.push(args[1]);
             fs.writeFileSync("./ipbans.json", JSON.stringify(ips), {encoding:'utf8', flag:'w'})
+            console.log("To apply changes, restart the skibidihub server.");
             break;
         case "unban":
             if(!args[1]) return console.log("you need to provide an ip address to unban!");
@@ -33,8 +34,9 @@ async function main() {
             if(!ips.includes(args[1])) return console.log("the ip address provided isnt banned.");
             ips.splice(ips.indexOf(args[1]), 1)
             fs.writeFileSync("./ipbans.json", JSON.stringify(ips), {encoding:'utf8', flag:'w'})
+            console.log("To apply changes, restart the skibidihub server.");
             break;
-        case "delete":
+        case "deleteVideo":
             if(!args[1]) return console.log("you need to provide a video id to delete!");
             if(!utils.videoExists(args[1])) return console.log("the video you are trying to delete doesnt exist!");
             
@@ -66,6 +68,57 @@ async function main() {
                 if(!fs.existsSync(path.join(videoPath, "video.mp4"))) return await deleteVideo(id);
                 if(!fs.existsSync(path.join(videoPath, "thumbnail.jpg"))) return await deleteVideo(id);
             })
+            break;
+        case "updateSocialScore":
+            if(!args[1]) return console.log("Please Provide a user to update the social credit score of.");
+            if(!args[2]) return console.log("Please provide a value to update the social credit score.");
+            if(!utils.userExists(args[1])) return console.log("User doesn't exist!");
+            
+            const socialScoreData = await client
+            .from("users")
+            .select("social_score")
+            .eq("name", args[1]);
+        
+            const socialScore = parseInt(socialScoreData["data"][0]["social_score"]) + parseInt(args[2]);
+
+            await client.from("users").update({"social_score": socialScore}).eq("name", args[1]).then(data => {
+                if(data.error) {
+                    return console.error(data);
+                } else if(data.status != 204) {
+                    return console.error(data);
+                }
+
+                return console.log("Updated successfully.");
+            });
+
+            break;
+        case "verifyUser":
+            if(!args[1]) return console.log("Please provide a user to verify.");
+            if(!utils.userExists(args[1])) return console.log("User doesn't exist!");
+
+            await client.from("users").update({"verified": "TRUE"}).eq("name", args[1]).then(data => {
+                if(data.error) {
+                    return console.error(data);
+                } else if(data.status != 204) {
+                    return console.error(data);
+                }
+
+                return console.log("Verified successfully.");
+            });
+            break;
+        case "deVerifyUser":
+            if(!args[1]) return console.log("Please provide a user to verify.");
+            if(!utils.userExists(args[1])) return console.log("User doesn't exist!");
+
+            await client.from("users").update({"verified": "FALSE"}).eq("name", args[1]).then(data => {
+                if(data.error) {
+                    return console.error(data);
+                } else if(data.status != 204) {
+                    return console.error(data);
+                }
+
+                return console.log("Deverified successfully.");
+            });
             break;
         default:
             console.log("SkibidiHub Administration CLI\n\nPlease enter a valid command.")

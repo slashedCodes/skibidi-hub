@@ -1,0 +1,45 @@
+html, body {
+    background-color: black;
+    color: orange;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    background-color: #2a2a2a;
+    padding: 10px;
+    border-radius: 10px;
+
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    background-color: black;
+    color: orange;
+    font-family: cursive;
+    border-radius: 20px;
+    border: none;
+    padding: 5px;
+}
+
+textarea {
+    background-color: black;
+    color: orange;
+    font-family: cursive;
+    border-radius: 20px;
+    border: none;
+    padding: 5px;
+}

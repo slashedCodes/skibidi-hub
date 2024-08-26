@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("form").addEventListener("submit", (e) => {
+  document.getElementById("form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const form = new FormData(document.getElementById("form"));
 
@@ -11,15 +11,24 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    login(form.get("username"));
-    alert("Login successfull.");
-    window.location.pathname = "/";
+    await login(form.get("username"));
+
   });
 });
 
-function login(user) {
+async function login(user) {
   Cookies.set("user", user);
   Cookies.set("token", getToken(user));
+
+  return await axios.post("/api/login", {
+    user: user,
+  }).then(data => {
+    if(data.status != 200) return console.error(data);
+
+    alert("Login successfull.");
+    window.location.pathname = "/";
+    return;
+  });
 }
 
 function getToken(user) {
