@@ -22,6 +22,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Edit successfull.");
             window.location.pathname = `/user/${encodeURIComponent(Cookies.get("user"))}`
         }).catch(async (error) => {
+            if(error.status == 502) {
+                alert("Cloudflare error, please try again.");
+                return;
+            }
             if(error.response) alert(error.response.data.message)
             console.error(error);
             throw new Error(`Error: ${error}`);
