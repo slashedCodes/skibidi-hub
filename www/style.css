@@ -64,6 +64,25 @@ body {
     flex-direction: column !important;
     gap: 5px !important;
   }
+
+  .video-actions {
+    display: flex;
+    flex-direction: column !important;
+    gap: 10px;
+  }
+
+  .subscribe {
+    border-radius: 100%;
+    border: solid brown 2px;
+    font-size: 18px;
+    height: 40px !important;
+  }
+
+  .user-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
 }
 
 .navbar-spacer {

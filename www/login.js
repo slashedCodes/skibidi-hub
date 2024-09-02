@@ -17,8 +17,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function login(user) {
-  Cookies.set("user", user);
-  Cookies.set("token", getToken(user));
+  // This is for safari PWA's because fuck you safari i guess
+  Cookies.set("user", user, {
+    expires: 365,
+  });
+
+  Cookies.set("token", getToken(user), {
+    expires: 365,
+  });
 
   return await axios.post("/api/login", {
     user: user,

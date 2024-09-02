@@ -101,11 +101,19 @@ app.get("/search", (req, res) => {
 });
 
 app.get("/video/:id", (req, res) => {
-  if(!utils.videoExists(req.params.id)) return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
+  if(!utils.videoExists(req.params.id) && utils.checkToken(req, "/video/:id")) {
+    return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
+  }
+  
   res.sendFile(path.join(__dirname, path.join("www", "video.html")));
 });
 
 app.get("/user/:user", (req, res) => {
+  if(!utils.checkToken(req, "/user/:user")) {
+    return res.sendFile(path.join(__dirname, path.join("www", "user.html")));
+  }
+
+
   // Check if user exists
   client.from("users").select().eq("name", decodeURIComponent(req.params.user)).then(data => {
     if(data.error) {
@@ -207,8 +215,6 @@ app.get("/api/webhookThumbnail/:id", (req, res) => {
 
 // Get the info for a video according to its video ID.
 app.get("/api/videoInfo/:id", (req, res) => {
-  if(!utils.videoExists(req.params.id)) return res.sendStatus(404);
-
   if(!utils.checkToken(req, "/api/videoInfo/:id")) {
     let newData = {};
     newData.title = utils.fakeTitleList[utils.getRandomInt(utils.fakeTitleList.length)]
@@ -219,6 +225,8 @@ app.get("/api/videoInfo/:id", (req, res) => {
     newData.uploaded_at = new Date().toISOString().toString();
     return res.send(newData);
   }
+
+  if(!utils.videoExists(req.params.id)) return res.sendStatus(404);
 
   client
     .from("videos")
@@ -237,6 +245,19 @@ app.get("/api/videoInfo/:id", (req, res) => {
 
 // Pulls the user information from the database and returns it.
 app.get("/api/userInfo/:id", (req, res) => {
+  if(!utils.checkToken(req, "/api/userInfo/:id")) {
+    let data = {
+      name: "SIGN IN to see this EPIC CONTENT",
+      subscribers: 999,
+      social_score: 999,
+      description: "SIGN IN to see this EPIC content",
+      verified: true
+    }
+
+    return res.send(data);
+  }
+
+
   client.from("users").select().eq("name", decodeURIComponent(req.params.id)).then(data => {
     if(data.error) {
       return res.sendStatus(400);
@@ -324,8 +345,6 @@ app.post("/api/editUser", async (req, res) => {
 
 // Get the comments for a video according to its video ID.
 app.get("/api/comments/:videoID", (req, res) => {
-  if(!utils.videoExists(req.params.videoID)) return res.sendStatus(404);
-
   if(!utils.checkToken(req, "/api/comments/:videoID")) {
     let comments = [];
     for(let i = 0; i < 8; i++) {
@@ -340,6 +359,8 @@ app.get("/api/comments/:videoID", (req, res) => {
 
     return res.send(comments);
   }
+
+  if(!utils.videoExists(req.params.videoID)) return res.sendStatus(404);
 
   client
     .from("comments")
@@ -417,6 +438,8 @@ app.post("/api/comment", async (req, res) => {
   if(!req.body.commenter) return res.sendStatus(400);
   if(!req.body.videoID) return res.sendStatus(400);
   if(!req.body.text) return res.sendStatus(400);
+  
+  if(req.body.text.trim() == "") return res.sendStatus(400);
   if(!utils.videoExists(req.body.videoID)) return res.sendStatus(404);
 
   client
