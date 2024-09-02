@@ -2,7 +2,6 @@ const express = require("express");
 const fs = require("node:fs");
 const path = require("node:path");
 const supabase = require("@supabase/supabase-js");
-const bodyParser = require("body-parser");
 const cookie_parser = require("cookie-parser");
 const multer = require("multer");
 const app = express();
@@ -72,8 +71,8 @@ app.use(function(req, res, next) {
 });
 
 app.use(express.static("www")); // Static folder
-app.use(bodyParser.json());
-app.use(cookie_parser());
+app.use(express.json()); // JSON body parser
+app.use(cookie_parser()); // Cookie parser
 
 // User facing URL's
 app.get("/", (req, res) => {
@@ -439,6 +438,7 @@ app.post("/api/comment", async (req, res) => {
   if(!req.body.videoID) return res.sendStatus(400);
   if(!req.body.text) return res.sendStatus(400);
   
+
   if(req.body.text.trim() == "") return res.sendStatus(400);
   if(!utils.videoExists(req.body.videoID)) return res.sendStatus(404);
 

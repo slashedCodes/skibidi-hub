@@ -105,11 +105,16 @@ function checkUserToken(req, func) {
 
 
 async function sendWebhook(message, username, embeds) {
-  await axios.post(webhookURL, {
-    "username": username,
-    "content": message,
-    "embeds": embeds
-  })
+  try {
+    await axios.post(webhookURL, {
+      "username": username,
+      "content": message,
+      "embeds": embeds
+    })
+  } catch (error) {
+    console.error(error);
+    console.log("discord webhook rate limit probably");
+  }
 }
 
 const nanoid = (length) => {
