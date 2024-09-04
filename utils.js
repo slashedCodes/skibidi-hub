@@ -6,6 +6,7 @@ const supabase = require("@supabase/supabase-js");
 require("dotenv").config();
 
 const webhookURL = process.env.WEBHOOK_URL;
+const logWebhookURL = process.env.LOG_WEBHOOK_URL;
 const client = supabase.createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
@@ -69,6 +70,7 @@ function videoExists(id) {
 
 const ipwareObject = require("@fullerstack/nax-ipware");
 const ipware = new ipwareObject.Ipware();
+let lastMessage = ""
 function checkToken(req, func) {
   const token = req.cookies.token;
   const ipInfo = ipware.getClientIP(req);
@@ -78,10 +80,16 @@ function checkToken(req, func) {
   if (token.trim() == "") return;
   let split = token.split("*&*&*&*&&&&*&&&&*&****&***&*");
   if (split.length > 1 && split[1] === "nexacopicloves15yearoldchineseboys") {
-    console.log(`${func} being triggered by: ${split[0]} with the IP of ${ipInfo.ip}`);
+    let message = `${func} being triggered by: ${split[0]} with the IP of ${ipInfo.ip}`;
+    if(message == lastMessage) return true;
+    lastMessage = message;
+    sendWebhook(message, "SkibidiHub Logger", [], logWebhookURL)
     return true;
   } else {
-    console.log(`${func} is being triggered by ${ipInfo.ip}`);
+    let message = `${func} is being triggered by ${ipInfo.ip}`;
+    if(message == lastMessage) return false;
+    lastMessage = message;
+    sendWebhook(message, "SkibidiHub Logger", [], logWebhookURL)
     return false;
   }
 }
@@ -104,9 +112,9 @@ function checkUserToken(req, func) {
 }
 
 
-async function sendWebhook(message, username, embeds) {
+async function sendWebhook(message, username, embeds, url) {
   try {
-    await axios.post(webhookURL, {
+    await axios.post(url, {
       "username": username,
       "content": message,
       "embeds": embeds
