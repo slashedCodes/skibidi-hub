@@ -181,4 +181,35 @@ function isValidUrl(string) {
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
-module.exports = {isValidUrl, multerErrorHandler, getRandomInt, videoExists, checkToken, sendWebhook, nanoid, checkBodyVideo, checkFile, getThumbnail, userExists, checkUserToken, fakeCommentList, fakeTitleList};
+function discordCheck(req) {
+  const ipInfo = ipware.getClientIP(req);
+  return req.headers['user-agent'] == "Mozilla/5.0 (Macintosh; Intel Mac OS X 11.6; rv:92.0) Gecko/20100101 Firefox/92.0" && 
+  !req.headers['accept-language'] &&
+  !req.headers['priority'] &&
+  !req.headers['sec-ch-ua'] &&
+  !req.headers['upgrade-insecure-requests'] ||
+  ipInfo.ip == "2a06:98c0:3600::103" || // Discord proxy ip's
+  ipInfo.ip == "35.227.62.178"
+}
+
+async function videoInfo(id) {
+  return new Promise(async (resolve, reject) => {
+    await client
+      .from("videos")
+      .select()
+      .eq("id", id)
+      .then((data) => {
+        if (data.error) {
+          resolve(400);
+        } else if (data.status != 200) {
+          resolve(data.status);
+        }
+
+        console.log(data.data[0])
+        resolve(data.data[0]);
+      });
+  })
+
+}
+
+module.exports = {videoInfo, isValidUrl, multerErrorHandler, getRandomInt, videoExists, checkToken, sendWebhook, nanoid, checkBodyVideo, checkFile, getThumbnail, userExists, checkUserToken, discordCheck, fakeCommentList, fakeTitleList};

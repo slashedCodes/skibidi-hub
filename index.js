@@ -8,6 +8,7 @@ const app = express();
 require("dotenv").config();
 
 const utils = require("./utils.js");
+const url = "https://skibidihub.buttplugstudios.xyz"
 
 const port = 3000;
 const storage = multer.diskStorage({
@@ -99,11 +100,25 @@ app.get("/search", (req, res) => {
   res.sendFile(path.join(__dirname, path.join("www", "search.html")));
 });
 
-app.get("/video/:id", (req, res) => {
+app.set('view engine', 'ejs');
+app.get("/video/:id", async (req, res) => {
+  if(utils.discordCheck(req) && utils.videoExists(req.params.id)) {
+    const videoInfo = await utils.videoInfo(req.params.id);
+    if(isNaN(videoInfo)) {
+      return res.render("video", {
+        video: `${url}/api/video/${req.params.id}.mp4`,
+        video_name: videoInfo.title,
+        description: videoInfo.description,
+        url: url,
+        author_url: `${url}/api/oembed/?author_name=${videoInfo.uploader}&author_url=${url}/user/${encodeURIComponent(videoInfo.uploader)}`
+      })
+    }
+  }
+
   if(!utils.videoExists(req.params.id) && utils.checkToken(req, "/video/:id")) {
     return res.sendFile(path.join(__dirname, path.join("www", "404.html")));
   }
-  
+
   res.sendFile(path.join(__dirname, path.join("www", "video.html")));
 });
 
@@ -111,7 +126,6 @@ app.get("/user/:user", (req, res) => {
   if(!utils.checkToken(req, "/user/:user")) {
     return res.sendFile(path.join(__dirname, path.join("www", "user.html")));
   }
-
 
   // Check if user exists
   client.from("users").select().eq("name", decodeURIComponent(req.params.user)).then(data => {
@@ -128,9 +142,8 @@ app.get("/user/:user", (req, res) => {
 
 // API //
 
-// Get an mp4 file according to its video ID.
-app.get("/api/video/:id", function (req, res) {
-  if(!utils.checkToken(req, "/api/video/:id")) {
+function handleVideoAPI(req, res) {
+  if(!utils.checkToken(req, "/api/video/:id") && !utils.discordCheck(req)) {
     return res.sendFile(
       path.join(
         __dirname,
@@ -177,6 +190,42 @@ app.get("/api/video/:id", function (req, res) {
     res.writeHead(200, head);
     fs.createReadStream(videoPath).pipe(res);
   }
+}
+
+// Get an mp4 file according to its video ID.
+app.get('/api/video/:id*.mp4', handleVideoAPI);
+app.get("/api/video/:id", handleVideoAPI);
+
+// OEmbed
+const oembed = (provider_name, provider_url, author_name, author_url, url) => {
+  const baseObject = {
+      version: '1.0',
+  };
+  if (provider_name && provider_url) {
+      baseObject.provider_name = provider_name;
+      baseObject.provider_url = provider_url;
+  }
+  if (author_name) {
+      baseObject.author_name = author_name;
+  }
+  if (author_url) {
+      baseObject.author_url = author_url;
+  }
+  if (url) {
+      baseObject.url = url;
+  }
+  return baseObject;
+};
+
+app.get('/api/oembed', (req, res) => {
+  const {
+      provider_name,
+      provider_url,
+      author_name,
+      author_url,
+      url,
+  } = req.query;
+  return res.status(200).send(oembed(provider_name, provider_url, author_name, author_url, url));
 });
 
 // Get a videos thumbnail according to its video ID.
@@ -213,7 +262,7 @@ app.get("/api/webhookThumbnail/:id", (req, res) => {
 });
 
 // Get the info for a video according to its video ID.
-app.get("/api/videoInfo/:id", (req, res) => {
+app.get("/api/videoInfo/:id", async (req, res) => {
   if(!utils.checkToken(req, "/api/videoInfo/:id")) {
     let newData = {};
     newData.title = utils.fakeTitleList[utils.getRandomInt(utils.fakeTitleList.length)]
@@ -227,19 +276,12 @@ app.get("/api/videoInfo/:id", (req, res) => {
 
   if(!utils.videoExists(req.params.id)) return res.sendStatus(404);
 
-  client
-    .from("videos")
-    .select()
-    .eq("id", req.params.id)
-    .then((data) => {
-      if (data.error) {
-        return res.sendStatus(400);
-      } else if (data.status != 200) {
-        return res.sendStatus(data.status);
-      }
-
-      return res.send(data.data[0]);
-    });
+  const videoInfo = await utils.videoInfo(req.params.id);
+  if(isNaN(videoInfo)) {
+    return res.send(videoInfo);
+  } else {
+    return res.sendStatus(videoInfo);
+  }
 });
 
 // Pulls the user information from the database and returns it.
@@ -422,7 +464,7 @@ app.post("/api/search", (req, res) => {
 
     let results = [];
     response.data.forEach(video => {
-      if(video.title.startsWith(req.body.query) || video.uploader.startsWith(req.body.query)) results.push(video);
+      if(video.title.startsWith(req.body.query.toLowerCase()) || video.uploader.startsWith(req.body.query.toLowerCase())) results.push(video);
     })
 
     return res.send(results);
