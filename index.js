@@ -7,6 +7,7 @@ const multer = require("multer");
 const app = express();
 require("dotenv").config();
 
+const webhookURL = process.env.WEBHOOK_URL;
 const utils = require("./utils.js");
 const url = "https://skibidihub.buttplugstudios.xyz"
 
@@ -511,7 +512,8 @@ app.post("/api/comment", async (req, res) => {
             "url": `http://skibidihub.buttplugstudios.xyz/video/${req.body.videoID}`,
             "color": 917248
           }
-        ]
+        ],
+        webhookURL
       )
     });
 });
@@ -601,7 +603,8 @@ app.post("/api/upload", upload.fields([
             "url": `https://skibidihub.buttplugstudios.xyz/api/webhookThumbnail/${req.skibidihub_id}`
           }
         }
-      ]
+      ],
+      webhookURL
     )
   })
 })

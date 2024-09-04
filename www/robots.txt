@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /login
+Allow: /editProfile
+Allow: /contact
+Allow: /
+Disallow: /video/*
+Disallow: /user/*
+Disallow: /api/*
+
+Sitemap: https://skibidihub.buttplugstudios.xyz/sitemap.xml

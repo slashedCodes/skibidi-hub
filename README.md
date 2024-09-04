@@ -26,6 +26,7 @@ First off, you need to have a .env file with your supabase API keys and a discor
 SUPABASE_URL=""
 SUPABASE_KEY=""
 WEBHOOK_URL=""
+LOG_WEBHOOK_URL=""
 ```
 
 For supabase you need to have three tables (RLS is disabled for every table, because I couldn't be bothered):
