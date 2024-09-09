@@ -11,6 +11,12 @@ const webhookURL = process.env.WEBHOOK_URL;
 const utils = require("./utils.js");
 const url = "https://skibidihub.buttplugstudios.xyz"
 
+let ipBlacklist = JSON.parse(fs.readFileSync("./ipbans.json"));
+fs.watch("./ipbans.json", () => {
+  console.log("Reloading IP Bans...");
+  ipBlacklist = JSON.parse(fs.readFileSync("./ipbans.json"));
+});
+
 const port = 3000;
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -60,7 +66,6 @@ const client = supabase.createClient(
 
 const ipwareObject = require("@fullerstack/nax-ipware");
 const ipware = new ipwareObject.Ipware();
-const ipBlacklist = JSON.parse(fs.readFileSync("./ipbans.json"));
 app.use(function(req, res, next) {
   req.ipInfo = ipware.getClientIP(req);
 
@@ -568,7 +573,6 @@ app.get("/api/userVideos/:id", async (req, res) => {
 app.post("/api/upload", upload.fields([
   { name: 'video' }, { name: 'thumbnail' }
 ]), utils.multerErrorHandler, async (req, res) => {
-  console.log(req.skibidihub_id);
   if(!utils.checkBodyVideo(req.body)) return res.status(400).json({ message: "invalid video body" });
   if(!utils.checkToken(req, "/api/upload")) return res.status(401).json({ message: "SIGN IN to UPLOAD videos!!!" });
 
@@ -585,7 +589,7 @@ app.post("/api/upload", upload.fields([
     })
     // Discord webhook
     utils.sendWebhook(
-      `new video guys <@&1274653503448678440>`,
+      `new video guys <@&1274653503448678440> \`\`${req.skibidihub_id}\`\``,
       "New UPLOAD!!!!",
       [
         {

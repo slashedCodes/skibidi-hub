@@ -72,23 +72,23 @@ const ipwareObject = require("@fullerstack/nax-ipware");
 const ipware = new ipwareObject.Ipware();
 let lastMessage = ""
 function checkToken(req, func) {
-  const token = req.cookies.token;
+  let token = req.cookies.token;
   const ipInfo = ipware.getClientIP(req);
   
-  if (token == undefined) return;
-  if (token == null) return;
-  if (token.trim() == "") return;
+  if (token == undefined || token == null || token.trim() == "") token = "";
   let split = token.split("*&*&*&*&&&&*&&&&*&****&***&*");
   if (split.length > 1 && split[1] === "nexacopicloves15yearoldchineseboys") {
     let message = `${func} being triggered by: ${split[0]} with the IP of ${ipInfo.ip}`;
     if(message == lastMessage) return true;
     lastMessage = message;
+    console.log(message);
     sendWebhook(message, "SkibidiHub Logger", [], logWebhookURL)
     return true;
   } else {
-    let message = `${func} is being triggered by ${ipInfo.ip}`;
+    let message = `${func} is being triggered by ${ipInfo.ip} (unregistered hypercam 2)`;
     if(message == lastMessage) return false;
     lastMessage = message;
+    console.log(message);
     sendWebhook(message, "SkibidiHub Logger", [], logWebhookURL)
     return false;
   }
@@ -191,13 +191,16 @@ function isValidUrl(string) {
 
 function discordCheck(req) {
   const ipInfo = ipware.getClientIP(req);
-  return req.headers['user-agent'] == "Mozilla/5.0 (Macintosh; Intel Mac OS X 11.6; rv:92.0) Gecko/20100101 Firefox/92.0" && 
+  const value = req.headers['user-agent'] == "Mozilla/5.0 (Macintosh; Intel Mac OS X 11.6; rv:92.0) Gecko/20100101 Firefox/92.0" && 
   !req.headers['accept-language'] &&
   !req.headers['priority'] &&
   !req.headers['sec-ch-ua'] &&
   !req.headers['upgrade-insecure-requests'] ||
   ipInfo.ip == "2a06:98c0:3600::103" || // Discord proxy ip's
   ipInfo.ip == "35.227.62.178"
+
+  if(value) console.log("detected discord media proxy (video embed)")
+  return value 
 }
 
 async function videoInfo(id) {
@@ -213,7 +216,6 @@ async function videoInfo(id) {
           resolve(data.status);
         }
 
-        console.log(data.data[0])
         resolve(data.data[0]);
       });
   })

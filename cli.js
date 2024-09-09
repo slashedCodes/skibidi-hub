@@ -26,7 +26,7 @@ async function main() {
             ips = JSON.parse(fs.readFileSync("./ipbans.json"));
             ips.push(args[1]);
             fs.writeFileSync("./ipbans.json", JSON.stringify(ips), {encoding:'utf8', flag:'w'})
-            console.log("To apply changes, restart the skibidihub server.");
+            console.log("Successfully banned ip.");
             break;
         case "unban":
             if(!args[1]) return console.log("you need to provide an ip address to unban!");
@@ -34,7 +34,7 @@ async function main() {
             if(!ips.includes(args[1])) return console.log("the ip address provided isnt banned.");
             ips.splice(ips.indexOf(args[1]), 1)
             fs.writeFileSync("./ipbans.json", JSON.stringify(ips), {encoding:'utf8', flag:'w'})
-            console.log("To apply changes, restart the skibidihub server.");
+            console.log("Successfully unbanned ip.");
             break;
         case "deleteVideo":
             if(!args[1]) return console.log("you need to provide a video id to delete!");
