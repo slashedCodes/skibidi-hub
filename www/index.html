@@ -16,6 +16,12 @@
     <title>SkibidiHub - Home</title>
   </head>
   <body>
+    <div class="sunset-container disabled" id="sunset-container">
+      <audio class="hidden" id="badong">
+        <source type="audio/mp3" src="/assets/badong.mp3">
+      </audio>
+    </div>
+
     <div class="john-pork-container disabled" id="john-pork-container">
       <div class="john-pork disabled" id="john-pork">
         <img src="/assets/johnpork.jpg" draggable="false" class="john-pork-image" />
@@ -53,6 +59,11 @@
         <button id="logout-button" onclick="Cookies.remove('user'); Cookies.remove('token'); window.location.reload()" class="login disabled">Logout</button>
         <div class="navbar-spacer"></div>
       </div>
+    </div>
+
+    <div class="countdown" id="sunset" style="display: none;">
+      <h1 id="sunset-countdown"></h1>
+      before skibidihub goes boom
     </div>
 
     <h1>Recomended videos:</h1>

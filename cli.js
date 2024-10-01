@@ -120,6 +120,15 @@ async function main() {
                 return console.log("Deverified successfully.");
             });
             break;
+        case "sunset":
+            if(!args[1]) return console.log("please provide a unix timestamp for when you want skibidihub to explode");
+            const sunset = path.join(__dirname, "sunset.json")
+            const json = JSON.parse(fs.readFileSync(sunset))
+            json.sunset = true
+            json.timestamp = args[1]
+            const text = JSON.stringify(json)
+            fs.writeFileSync(sunset, text);
+            break;
         default:
             console.log("SkibidiHub Administration CLI\n\nPlease enter a valid command.")
             break;

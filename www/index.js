@@ -1,11 +1,45 @@
 // Gets all the videos uploaded to SkibidiHub
 async function getAllVideos() {
-
   return await axios.get("/api/getAllVideos").then(response => {
     return response.data;
   }).catch(error => {
     throw new Error(`getAllVideos() error: ${error}`);
   });
+}
+
+async function sunset() {
+  return await axios.get("/api/sunset").then(response => {
+    return response.data;
+  }).catch(error => {
+    throw new Error(`sunset(): error: ${error}`);
+  })
+}
+
+function checkSunset(timestamp) {
+  const countDownTime = timestamp
+  const currentTime = new Date().getTime();
+
+  return (countDownTime - currentTime) < 1
+}
+
+function updateTime(timestamp) {
+  const countDownTime = timestamp
+  const currentTime = new Date().getTime();
+
+  var delta = Math.abs(countDownTime - currentTime) / 1000;
+
+  var days = Math.floor(delta / 86400);
+  delta -= days * 86400;
+
+  var hours = Math.floor(delta / 3600) % 24;
+  delta -= hours * 3600;
+
+  var minutes = Math.floor(delta / 60) % 60;
+  delta -= minutes * 60;
+
+  var seconds = Math.floor(delta % 60);  // in theory the modulus is not required
+
+  document.getElementById("sunset-countdown").innerText = `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
 }
 
 // Gets all the videos uploaded to SkibidiHub and sorts them randomly. (This is our algorithm)
@@ -30,7 +64,31 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+function badong() {
+  document.getElementById("badong").play();
+  setTimeout(badong, 4000);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+  const countdown = await sunset();
+  if (countdown.sunset) { // Doom
+    updateTime(countdown.timestamp)
+    document.getElementById("sunset").style.display = "block";
+    setInterval(() => {updateTime(countdown.timestamp)}, 1000)
+
+    const container = document.getElementById("sunset-container");
+    container.classList.remove("disabled")
+    container.addEventListener("click", () => {
+      if(checkSunset()) {
+
+      } else {
+        container.classList.add("disabled");
+        window.scrollTo(0, 0)
+        badong()
+      }
+    })
+  }
+
   document.getElementById("account-button-anchor").href = `/user/${encodeURIComponent(Cookies.get('user'))}`
   if (Cookies.get("user") != null) {
     document.getElementById("login-button").classList.add("disabled");

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="start" id="start">click to start</div>
+    
+    <video src="assets/piss baby.mp4" id="video"></video>
+
+    <div class="skib">
+        Skibidihub is over. Thank you for the memories. - SKibididihub team.
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("start").addEventListener("click", () => {
+                document.getElementById("start").style.display = "none";
+                document.getElementById("video").play();
+            })
+
+            document.getElementById("video").addEventListener("ended", () => {
+                document.getElementById("video").style.display = "none";
+            })
+        })
+    </script>
+
+    <style>
+        .skib {
+            position: absolute;
+            background-color: black;
+            color: orange;
+            width: 100vw;
+            height: 100vh;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: cursive;
+            
+        }
+
+        html, body {
+            background-color: black;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .start {
+            z-index: 6000;
+            position: absolute;
+            background-color: black;
+            color: white;
+            width: 100vw;
+            height: 100vh;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #video {
+            z-index: 3000;
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .start:hover {
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html>
