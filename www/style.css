@@ -26,6 +26,10 @@ body {
   background-color: #2b2b2b;
 }
 
+.hidden {
+  display: none;
+}
+
 @media only screen and (max-width: 750px) {
   .navbar {
     width: 100vw;
@@ -324,6 +328,14 @@ body {
   user-select: none;
 }
 
+.sunset-container {
+  z-index: 50000 !important;
+  position:absolute;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+
 .john-pork {
   position: absolute;
   width: 100vw;
@@ -460,4 +472,15 @@ body {
   display: flex;
   flex-direction: row;
   gap: 15px;
+}
+
+.countdown {
+  color: black;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
 }

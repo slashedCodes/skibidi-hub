@@ -26,7 +26,7 @@ async function main() {
             ips = JSON.parse(fs.readFileSync("./ipbans.json"));
             ips.push(args[1]);
             fs.writeFileSync("./ipbans.json", JSON.stringify(ips), {encoding:'utf8', flag:'w'})
-            console.log("To apply changes, restart the skibidihub server.");
+            console.log("Successfully banned ip.");
             break;
         case "unban":
             if(!args[1]) return console.log("you need to provide an ip address to unban!");
@@ -34,7 +34,7 @@ async function main() {
             if(!ips.includes(args[1])) return console.log("the ip address provided isnt banned.");
             ips.splice(ips.indexOf(args[1]), 1)
             fs.writeFileSync("./ipbans.json", JSON.stringify(ips), {encoding:'utf8', flag:'w'})
-            console.log("To apply changes, restart the skibidihub server.");
+            console.log("Successfully unbanned ip.");
             break;
         case "deleteVideo":
             if(!args[1]) return console.log("you need to provide a video id to delete!");
@@ -119,6 +119,15 @@ async function main() {
 
                 return console.log("Deverified successfully.");
             });
+            break;
+        case "sunset":
+            if(!args[1]) return console.log("please provide a unix timestamp for when you want skibidihub to explode");
+            const sunset = path.join(__dirname, "sunset.json")
+            const json = JSON.parse(fs.readFileSync(sunset))
+            json.sunset = true
+            json.timestamp = args[1]
+            const text = JSON.stringify(json)
+            fs.writeFileSync(sunset, text);
             break;
         default:
             console.log("SkibidiHub Administration CLI\n\nPlease enter a valid command.")
